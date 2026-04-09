@@ -137,7 +137,7 @@ export function startAttentionTest() {
         const age = calculator.getAttentionAge(effectiveTime);
 
         state.save('attention', effectiveTime);
-        saveResult('attention', age);
+        saveResult('attention', age, `${avgRawTime}ms`);
 
         const html = `
             <div class="result-box">

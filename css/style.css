@@ -1,17 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Space+Grotesk:wght@700;900&display=swap');
 
 :root {
-    --bg:           #04060f;
-    --surface:      #080c1c;
-    --surface-2:    #0c1128;
-    --card-bg:      rgba(10, 14, 36, 0.92);
-    --border:       rgba(255, 255, 255, 0.06);
+    --bg:           #1e2640;
+    --surface:      #252f4a;
+    --surface-2:    #2a3555;
+    --card-bg:      rgba(34, 42, 70, 0.95);
+    --border:       rgba(255, 255, 255, 0.09);
     --primary:      #7c3aed;
-    --primary-lite: rgba(124, 58, 237, 0.15);
+    --primary-lite: rgba(124, 58, 237, 0.18);
     --primary-grad: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-    --text:         #e2e8f0;
-    --text-sub:     #94a3b8;
-    --text-muted:   #475569;
+    --text:         #f1f5f9;
+    --text-sub:     #a8b8cc;
+    --text-muted:   #5a6a82;
     --neon-purple:  #a855f7;
     --neon-cyan:    #22d3ee;
     --neon-amber:   #fbbf24;
@@ -45,9 +45,9 @@ body {
     padding: 0;
     font-family: 'Noto Sans KR', sans-serif;
     background:
-        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(124, 58, 237, 0.18) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(34, 211, 238, 0.1) 0%, transparent 60%),
-        #04060f;
+        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(124, 58, 237, 0.35) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(34, 211, 238, 0.2) 0%, transparent 60%),
+        #1e2640;
     color: var(--text);
     display: flex;
     justify-content: center;
@@ -85,7 +85,7 @@ body {
 
 /* ── 헤더 ── */
 header {
-    background: rgba(6, 9, 24, 0.97);
+    background: rgba(16, 20, 40, 0.97);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     padding: 15px 22px;
@@ -1197,6 +1197,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .hist-same   { background: rgba(148,163,184,0.07); color: var(--text-sub); border: 1px solid rgba(148,163,184,0.15); }
 
 .hist-arrow { font-size: 1.1rem; line-height: 1; }
+.hist-raw   { font-size: 0.75rem; opacity: 0.6; margin-left: 2px; }
 
 /* ══════════════════════════════════════════
    ── 기록 화면 ──

@@ -138,7 +138,7 @@ export function startHearingTest() {
 function showResult(hz) {
     const age = calculator.getHearingAge(hz);
     state.save('hearing', hz);
-    saveResult('hearing', age);
+    saveResult('hearing', age, `${hz.toLocaleString()}Hz`);
 
     let specialMessage = "";
     let ageDisplay = `${age}세`;

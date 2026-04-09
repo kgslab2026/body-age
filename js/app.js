@@ -9,9 +9,28 @@ import { showHistoryView } from './history.js';
 
 const app = document.getElementById('app');
 
+const STATE_KEY = 'bodyage_state';
+
 export const state = {
     results: { hearing: null, neural: null, memory: null, balance: null, attention: null, vision: null },
-    save(key, value) { this.results[key] = value; }
+    save(key, value) {
+        this.results[key] = value;
+        try {
+            const saved = JSON.parse(localStorage.getItem(STATE_KEY) || '{}');
+            saved[key] = value;
+            localStorage.setItem(STATE_KEY, JSON.stringify(saved));
+        } catch {}
+    },
+    load() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(STATE_KEY) || '{}');
+            Object.assign(this.results, saved);
+        } catch {}
+    },
+    clear() {
+        Object.keys(this.results).forEach(k => { this.results[k] = null; });
+        localStorage.removeItem(STATE_KEY);
+    }
 };
 
 export function navigate(contentHtml, initFunction) {
@@ -23,14 +42,14 @@ export function navigate(contentHtml, initFunction) {
 }
 
 const indicators = [
-    { id: 'hearing',   icon: '🎵', label: '청력 나이',    color: 'cyan',    available: true, action: startHearingTest, range: '15~80세' },
+    { id: 'hearing',   icon: '🎧', label: '청력 나이',    color: 'cyan',    available: true, action: startHearingTest, range: '15~80세' },
     { id: 'neural',    icon: '⚡', label: '반응속도 나이', color: 'amber',   available: true, action: startNeuralTest,  range: '20~70세' },
-    { id: 'balance',   icon: '🌀', label: '균형감각 나이', color: 'emerald', available: true, action: startBalanceTest, range: '20~80세' },
+    { id: 'balance',   icon: '🦩', label: '균형감각 나이', color: 'emerald', available: true, action: startBalanceTest, range: '20~80세' },
     { id: 'attention', icon: '🎯', label: '집중력 나이',   color: 'red',     available: true, action: startAttentionTest, range: '20~80세' },
-    { id: 'vision',    icon: '🔮', label: '시력 나이',     color: 'violet',  available: true, action: startVisionTest,  range: '20~80세' },
-    { id: 'brain',     icon: '🧩', label: '기억력 나이',   color: 'blue',    available: true, action: startMemoryTest,  range: '20~80세' },
-    { id: 'coming1',   icon: '🚧', label: '준비중 기능1', color: 'gray',    available: false },
-    { id: 'coming2',   icon: '🚧', label: '준비중 기능2', color: 'gray',    available: false },
+    { id: 'vision',    icon: '🔍', label: '시력 나이',     color: 'violet',  available: true, action: startVisionTest,  range: '20~80세' },
+    { id: 'brain',     icon: '🧠', label: '기억력 나이',   color: 'blue',    available: true, action: startMemoryTest,  range: '20~80세' },
+    { id: 'coming1',   icon: '🚧', label: '', color: 'gray',    available: false },
+    { id: 'coming2',   icon: '🚧', label: '', color: 'gray',    available: false },
 ];
 
 // brain indicator의 결과는 state.results.memory에 저장됨
@@ -169,7 +188,7 @@ function showFinalResult() {
             ${pendingNote}
             <button id="final-save"  class="save-img-btn">📸 이미지로 저장</button>
             <button id="final-share" class="share-fab">📤 결과 공유하기</button>
-            <button id="final-history" class="history-fab">📋 기록 보기</button>
+            <button id="final-history" class="history-fab">📋 이전 기록 보기</button>
             <button id="final-home" class="btn" style="width:100%; margin-top:4px; background:#1e293b;">처음으로</button>
         </div>
     `;
@@ -466,10 +485,10 @@ export function showMain() {
         document.getElementById('btn-history')?.addEventListener('click', showHistoryView);
         document.getElementById('btn-share').addEventListener('click', shareApp);
         document.getElementById('summary-reset')?.addEventListener('click', () => {
-            Object.keys(state.results).forEach(k => { state.results[k] = null; });
+            state.clear();
             showMain();
         });
     });
 }
 
-window.onload = showMain;
+window.onload = () => { state.load(); showMain(); };

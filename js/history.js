@@ -21,10 +21,10 @@ function persist(data) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-export function saveResult(key, age) {
+export function saveResult(key, age, raw = null) {
     const data = load();
     if (!data[key]) data[key] = [];
-    data[key].unshift({ age, ts: Date.now() });
+    data[key].unshift({ age, raw, ts: Date.now() });
     if (data[key].length > MAX_ENTRIES) data[key].length = MAX_ENTRIES;
     persist(data);
 }
@@ -33,20 +33,22 @@ export function hasHistory() {
     return Object.values(load()).some(arr => arr.length > 0);
 }
 
-// 결과 화면에 인라인으로 삽입: "이전 기록: 38살 → 32살 ↓"
+// 결과 화면에 인라인으로 삽입: "이전 기록: 38살(310ms) → 32살(262ms) ↓"
 export function renderHistoryInline(key) {
-    const entries = load()[key] ?? [];
+    const entries = (load()[key] ?? []).filter(e => e.age <= 100);
     if (entries.length < 2) return '';
 
-    const curr = entries[0].age;
-    const prev = entries[1].age;
-    const diff = curr - prev;
+    const curr = entries[0];
+    const prev = entries[1];
+    const diff = curr.age - prev.age;
     const [arrow, cls] =
         diff < -1 ? ['↓', 'hist-better'] :
         diff >  1 ? ['↑', 'hist-worse']  :
                     ['→', 'hist-same'];
 
-    return `<div class="hist-inline ${cls}">이전 기록: ${prev}살 → ${curr}살 <span class="hist-arrow">${arrow}</span></div>`;
+    const fmt = e => e.raw != null ? `${e.age}살<span class="hist-raw">(${e.raw})</span>` : `${e.age}살`;
+
+    return `<div class="hist-inline ${cls}">이전 기록: ${fmt(prev)} → ${fmt(curr)} <span class="hist-arrow">${arrow}</span></div>`;
 }
 
 function formatDate(ts) {
@@ -72,7 +74,7 @@ export function showHistoryView() {
                 diff === null ? '' :
                 diff < -1 ? '<span style="color:#34d399">↓</span>' :
                 diff >  1 ? '<span style="color:#f87171">↑</span>' :
-                            '<span style="color:#94a3b8">→</span>';
+                            '';
             const isLatest = i === 0;
             return `
                 <div class="history-entry ${isLatest ? 'history-entry-latest' : ''}">

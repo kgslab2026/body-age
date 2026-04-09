@@ -108,7 +108,7 @@ export function startVisionTest() {
         const correctCount = results.filter(r => r.correct).length;
         const age = calculator.getVisionAge(correctCount);
         state.save('vision', correctCount);
-        saveResult('vision', age);
+        saveResult('vision', age, `${correctCount}/${LEVELS.length}개`);
 
         const html = `
             <div class="result-box">

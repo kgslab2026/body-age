@@ -199,7 +199,7 @@ export function startBalanceTest() {
         const age = calculator.getBalanceAge(sway);
         const ageLabel = age >= 80 ? '80살 이상' : `${age}살~${age + 4}살`;
         state.save('balance', sway);
-        saveResult('balance', age);
+        saveResult('balance', age, `${sway.toFixed(1)}°`);
 
         const html = `
             <div class="result-box">

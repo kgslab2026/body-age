@@ -122,7 +122,7 @@ export function startNeuralTest() {
         `;
 
         state.save('neural', avg);
-        saveResult('neural', age);
+        saveResult('neural', age, `${avg}ms`);
         navigate(html, () => {
             initTipsCard();
             document.getElementById('btn-home').onclick = goHome;
