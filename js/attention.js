@@ -93,7 +93,7 @@ export function startAttentionTest() {
                         document.querySelectorAll('.stroop-btn').forEach(b => b.disabled = true);
 
                         results.push({ correct, time: elapsed });
-                        setTimeout(nextRound, 350);
+                        setTimeout(nextRound, 600);
                     };
                 });
             });

@@ -7,6 +7,8 @@ import { startVisionTest } from './vision.js';
 import { calculator } from './calculator.js';
 import { showHistoryView } from './history.js';
 
+export const APP_URL = 'https://kgslab2026.github.io/body-age/';
+
 const app = document.getElementById('app');
 
 const STATE_KEY = 'bodyage_state';
@@ -180,7 +182,7 @@ function showFinalResult() {
         <div class="final-box">
             <div class="final-header">
                 <div class="final-grade" style="color:${grade.color}">${grade.g}</div>
-                <div class="final-avg-label">종합 신체 나이 (${done.length}/6)</div>
+                <div class="final-avg-label">종합 신체 나이 (${done.length}/${indicators.filter(i => i.available).length})</div>
                 <div class="final-avg">${avgAge}살</div>
                 <div class="final-msg">${grade.msg}</div>
             </div>
@@ -199,12 +201,11 @@ function showFinalResult() {
         document.getElementById('final-save').addEventListener('click', () => saveResultImage(done, avgAge, grade));
         document.getElementById('final-share').addEventListener('click', async () => {
             const btn = document.getElementById('final-share');
-            const url = 'https://kgslab2026.github.io/body-age/';
             if (navigator.share) {
-                try { await navigator.share({ title: '신체 나이 측정기', text: shareText, url }); }
-                catch (e) { if (e.name !== 'AbortError') copyFinalLink(btn, `${shareText}\n${url}`); }
+                try { await navigator.share({ title: '신체 나이 측정기', text: shareText, url: APP_URL }); }
+                catch (e) { if (e.name !== 'AbortError') copyFinalLink(btn, `${shareText}\n${APP_URL}`); }
             } else {
-                copyFinalLink(btn, `${shareText}\n${url}`);
+                copyFinalLink(btn, `${shareText}\n${APP_URL}`);
             }
         });
     });
@@ -282,7 +283,7 @@ function drawResultCard(done, avgAge, grade) {
     // 종합 나이 라벨
     ctx.fillStyle = '#64748b';
     ctx.font = '700 12px "Noto Sans KR", sans-serif';
-    ctx.fillText(`종합 신체 나이 (${done.length}/6)`, W / 2, y);
+    ctx.fillText(`종합 신체 나이 (${done.length}/${indicators.filter(i => i.available).length})`, W / 2, y);
     y += 20;
 
     // 평균 나이
@@ -351,7 +352,7 @@ function drawResultCard(done, avgAge, grade) {
     ctx.fillStyle = '#334155';
     ctx.font = '400 11px "Space Grotesk", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('kgslab2026.github.io/body-age', W / 2, y);
+    ctx.fillText(APP_URL.replace('https://', '').replace(/\/$/, ''), W / 2, y);
 
     return canvas;
 }
@@ -404,7 +405,7 @@ async function shareApp() {
     const shareData = {
         title: '신체 나이 측정기',
         text: '내 신체 나이가 궁금하다면? 청력·반응속도·균형·집중력·시력·기억력으로 측정해봐! 🕹️',
-        url: 'https://kgslab2026.github.io/body-age/',
+        url: APP_URL,
     };
 
     if (navigator.share) {
@@ -419,7 +420,7 @@ async function shareApp() {
 }
 
 function copyLink() {
-    navigator.clipboard.writeText('https://kgslab2026.github.io/body-age/').then(() => {
+    navigator.clipboard.writeText(APP_URL).then(() => {
         const btn = document.getElementById('btn-share');
         if (!btn) return;
         const original = btn.textContent;
@@ -432,7 +433,25 @@ function copyLink() {
     });
 }
 
+let toastTimer = null;
+function showComingSoonToast() {
+    let toast = document.getElementById('coming-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'coming-toast';
+        toast.className = 'coming-toast';
+        toast.textContent = '🚧 곧 출시될 예정이에요!';
+        document.body.appendChild(toast);
+    }
+    clearTimeout(toastTimer);
+    toast.classList.remove('show');
+    void toast.offsetWidth; // reflow
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
 export function showMain() {
+    const availableCount = indicators.filter(i => i.available).length;
     let completedCount = 0;
     const cards = indicators.map(item => {
         const done = item.available && hasResult(item.id);
@@ -440,7 +459,7 @@ export function showMain() {
 
         return `
             <div class="indicator-card card-${item.color} ${item.available ? 'available' : 'locked'}"
-                 ${item.available ? `id="card-${item.id}" aria-label="${item.label} 테스트 시작"` : `aria-label="${item.label} 준비중"`}>
+                 id="card-${item.id}" ${item.available ? `aria-label="${item.label} 테스트 시작"` : `aria-label="준비중"`}>
                 <div class="card-icon">${item.icon}</div>
                 <div class="card-label">${item.label}</div>
                 ${item.range ? `<div class="card-range">${item.range}</div>` : ''}
@@ -464,9 +483,9 @@ export function showMain() {
                 </div>
             </div>
             ${renderSummary()}
-            <button id="btn-final" class="final-fab" aria-label="종합 결과 보기">🏆 종합 결과 보기 ${completedCount > 0 ? `(${completedCount}/6)` : ''}</button>
+            <button id="btn-final" class="final-fab" aria-label="종합 결과 보기">🏆 종합 결과 보기 ${completedCount > 0 ? `(${completedCount}/${availableCount})` : ''}</button>
             <button id="btn-share" class="share-fab" aria-label="앱 추천하기">🔗 친구에게 추천하기</button>
-            <div class="section-label">지표 선택 · ${completedCount}/6 완료</div>
+            <div class="section-label">지표 선택 · ${completedCount}/${availableCount} 완료</div>
             <div class="card-grid">${cards}</div>
             <footer class="app-footer">
                 <a href="privacy.html" class="footer-link">개인정보처리방침</a>
@@ -478,8 +497,13 @@ export function showMain() {
 
     navigate(html, () => {
         indicators.forEach(item => {
-            if (!item.available) return;
-            document.getElementById(`card-${item.id}`).onclick = item.action;
+            const card = document.getElementById(`card-${item.id}`);
+            if (!card) return;
+            if (!item.available) {
+                card.onclick = showComingSoonToast;
+                return;
+            }
+            card.onclick = item.action;
         });
         document.getElementById('btn-final')?.addEventListener('click', showFinalResult);
         document.getElementById('btn-history')?.addEventListener('click', showHistoryView);

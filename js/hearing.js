@@ -13,6 +13,7 @@ export function startHearingTest() {
     let audioCtx;
 
     function playSound(hz, callback) {
+        try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
@@ -31,11 +32,34 @@ export function startHearingTest() {
         oscillator.start(now);
         oscillator.stop(now + 1.5);
         setTimeout(callback, 1500);
+        } catch (e) {
+            showAudioError();
+        }
     }
 
     function goHome() {
         if (audioCtx) audioCtx.close();
         showMain();
+    }
+
+    function showAudioError() {
+        const html = `
+            <div class="test-box">
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <div style="font-size:3rem; margin:20px 0; text-align:center;">🔇</div>
+                <div style="font-size:1.2rem; font-weight:900; color:#f87171; text-align:center;">오디오를 사용할 수 없어요</div>
+                <p style="color:#888; text-align:center; line-height:1.7; margin-top:10px;">
+                    브라우저가 소리 재생을 차단하고 있어요.<br>
+                    브라우저 설정에서 이 사이트의<br>
+                    <strong style="color:#fff;">오디오 권한을 허용</strong>한 뒤 다시 시도해 주세요.
+                </p>
+                <button id="retry-btn" class="btn" style="width:100%; margin-top:24px;">다시 시도</button>
+            </div>
+        `;
+        navigate(html, () => {
+            document.getElementById('btn-home').onclick = goHome;
+            document.getElementById('retry-btn').onclick = startHearingTest;
+        });
     }
 
     function askFreq() {
@@ -129,7 +153,12 @@ export function startHearingTest() {
     navigate(startHtml, () => {
         document.getElementById('btn-home').onclick = goHome;
         document.getElementById('start-test-btn').onclick = () => {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                showAudioError();
+                return;
+            }
             askFreq();
         };
     });

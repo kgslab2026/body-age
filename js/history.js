@@ -59,6 +59,88 @@ function formatDate(ts) {
     return d.toLocaleDateString('ko-KR', opt);
 }
 
+function buildSparkline(entries, key) {
+    // entries[0] = 최신, 그래프는 오래된 것 → 최신 순으로 표시
+    const pts = [...entries].reverse();
+    const W = 280, H = 90, PAD_L = 30, PAD_R = 12, PAD_T = 10, PAD_B = 24;
+
+    const ages = pts.map(e => e.age);
+    const minA = Math.max(0,  Math.min(...ages) - 5);
+    const maxA = Math.max(80, Math.max(...ages) + 5);
+
+    const toX = i => PAD_L + (i / Math.max(pts.length - 1, 1)) * (W - PAD_L - PAD_R);
+    const toY = a => PAD_T + (1 - (a - minA) / (maxA - minA)) * (H - PAD_T - PAD_B);
+
+    // 폴리라인 경로
+    const linePts = pts.map((e, i) => `${toX(i).toFixed(1)},${toY(e.age).toFixed(1)}`).join(' ');
+
+    // 면적 채우기용 polygon
+    const areaFirst = `${toX(0).toFixed(1)},${(H - PAD_B).toFixed(1)}`;
+    const areaLast  = `${toX(pts.length - 1).toFixed(1)},${(H - PAD_B).toFixed(1)}`;
+    const areaPts   = `${areaFirst} ${linePts} ${areaLast}`;
+
+    // Y축 눈금 (2개)
+    const midA = Math.round((minA + maxA) / 2);
+    const yMid = toY(midA);
+    const yMax = toY(maxA);
+    const yMin = toY(minA);
+
+    // X축 날짜 레이블 (최대 5개)
+    const step = Math.max(1, Math.floor(pts.length / 5));
+    const dateLabels = pts
+        .map((e, i) => ({ i, ts: e.ts }))
+        .filter((_, idx) => idx === 0 || idx === pts.length - 1 || idx % step === 0)
+        .slice(0, 5)
+        .map(({ i, ts }) => {
+            const d = new Date(ts);
+            const label = `${d.getMonth() + 1}/${d.getDate()}`;
+            return `<text x="${toX(i).toFixed(1)}" y="${H}" class="hg-date">${label}</text>`;
+        }).join('');
+
+    // 점
+    const dots = pts.map((e, i) => {
+        const isLatest = i === pts.length - 1;
+        return `<circle cx="${toX(i).toFixed(1)}" cy="${toY(e.age).toFixed(1)}"
+            r="${isLatest ? 4 : 2.5}"
+            class="${isLatest ? 'hg-dot-latest' : 'hg-dot'}" />`;
+    }).join('');
+
+    // 최신값 레이블
+    const latestX = toX(pts.length - 1);
+    const latestY = toY(pts[pts.length - 1].age);
+    const labelX  = Math.min(latestX + 6, W - PAD_R - 20);
+    const latestLabel = `<text x="${labelX.toFixed(1)}" y="${(latestY + 4).toFixed(1)}" class="hg-label-latest">${pts[pts.length - 1].age}살</text>`;
+
+    const gradId = `hg-grad-${key}`;
+    return `
+        <svg viewBox="0 0 ${W} ${H}" width="100%" class="hg-svg">
+            <defs>
+                <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stop-color="#a855f7" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+                </linearGradient>
+            </defs>
+            <!-- 그리드 -->
+            <line x1="${PAD_L}" y1="${yMax.toFixed(1)}" x2="${W - PAD_R}" y2="${yMax.toFixed(1)}" class="hg-grid"/>
+            <line x1="${PAD_L}" y1="${yMid.toFixed(1)}" x2="${W - PAD_R}" y2="${yMid.toFixed(1)}" class="hg-grid"/>
+            <line x1="${PAD_L}" y1="${yMin.toFixed(1)}" x2="${W - PAD_R}" y2="${yMin.toFixed(1)}" class="hg-grid"/>
+            <!-- Y축 레이블 -->
+            <text x="${(PAD_L - 4).toFixed(1)}" y="${(yMax + 4).toFixed(1)}" class="hg-ylabel">${Math.round(maxA)}</text>
+            <text x="${(PAD_L - 4).toFixed(1)}" y="${(yMid + 4).toFixed(1)}" class="hg-ylabel">${midA}</text>
+            <text x="${(PAD_L - 4).toFixed(1)}" y="${(yMin + 4).toFixed(1)}" class="hg-ylabel">${Math.round(minA)}</text>
+            <!-- 면적 -->
+            <polygon points="${areaPts}" fill="url(#${gradId})"/>
+            <!-- 선 -->
+            <polyline points="${linePts}" class="hg-line"/>
+            <!-- 점 -->
+            ${dots}
+            <!-- 최신값 레이블 -->
+            ${latestLabel}
+            <!-- X축 날짜 -->
+            ${dateLabels}
+        </svg>`;
+}
+
 export function showHistoryView() {
     const data = load();
     const hasAny = Object.values(data).some(a => a.length > 0);
@@ -67,22 +149,18 @@ export function showHistoryView() {
         const entries = data[key] ?? [];
         if (entries.length === 0) return '';
 
-        const rows = entries.map((e, i) => {
-            const prev = entries[i + 1];
-            const diff = prev ? e.age - prev.age : null;
-            const trend =
-                diff === null ? '' :
-                diff < -1 ? '<span style="color:#34d399">↓</span>' :
-                diff >  1 ? '<span style="color:#f87171">↑</span>' :
-                            '';
-            const isLatest = i === 0;
-            return `
-                <div class="history-entry ${isLatest ? 'history-entry-latest' : ''}">
-                    <span class="history-entry-date">${formatDate(e.ts)}</span>
-                    <span class="history-entry-age">${e.age}살 ${trend}</span>
-                </div>
-            `;
-        }).join('');
+        const latest  = entries[0];
+        const prev    = entries[1];
+        const diff    = prev ? latest.age - prev.age : null;
+        const [trendIcon, trendCls, trendText] =
+            diff === null ? ['', '', ''] :
+            diff < -1     ? ['↓', 'hg-better', `${Math.abs(diff)}살 개선`] :
+            diff >  1     ? ['↑', 'hg-worse',  `${diff}살 증가`] :
+                            ['→', 'hg-same',   '유지'];
+
+        const sparkline = entries.length >= 2
+            ? buildSparkline(entries, key)
+            : `<div class="hg-single">측정 1회 — 다음 측정 후 그래프가 표시됩니다</div>`;
 
         return `
             <div class="history-section">
@@ -91,7 +169,11 @@ export function showHistoryView() {
                     <span class="history-section-label">${meta.label}</span>
                     <span class="history-section-count">${entries.length}회</span>
                 </div>
-                ${rows}
+                <div class="hg-summary">
+                    <span class="hg-latest-age">${latest.age}살</span>
+                    ${diff !== null ? `<span class="hg-trend ${trendCls}">${trendIcon} ${trendText}</span>` : ''}
+                </div>
+                ${sparkline}
             </div>
         `;
     }).join('');

@@ -85,11 +85,13 @@ export function startBalanceTest() {
         if (count === 0) { runTest(); return; }
         const html = `
             <div class="balance-display">
+                <button class="btn-home" id="btn-home" style="position:absolute; top:16px; left:16px;"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
                 <div class="balance-countdown">${count}</div>
                 <div style="color:rgba(255,255,255,0.5); font-size:0.95rem;">한 발로 서세요!</div>
             </div>
         `;
         navigate(html, () => {
+            document.getElementById('btn-home').onclick = goHome;
             setTimeout(() => { if (active) showCountdown(count - 1); }, 1000);
         });
     }

@@ -497,6 +497,31 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     text-transform: uppercase;
 }
 
+/* ── 출시예정 토스트 ── */
+.coming-toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(30, 27, 75, 0.95);
+    border: 1px solid rgba(124, 58, 237, 0.5);
+    color: #e2e8f0;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 24px;
+    border-radius: 40px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 9999;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(124, 58, 237, 0.3);
+}
+.coming-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 /* ── 완료 오버레이 ── */
 .done-overlay {
     position: absolute;
@@ -1244,25 +1269,88 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     letter-spacing: 0.5px;
 }
 
-.history-entry {
+/* ── 기록 그래프 ── */
+.hg-summary {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 7px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    font-size: 0.82rem;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-.history-entry:last-child { border-bottom: none; }
-
-.history-entry-latest .history-entry-age { color: #a855f7; }
-
-.history-entry-date { color: var(--text-muted); }
-
-.history-entry-age {
+.hg-latest-age {
     font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
     font-weight: 900;
     color: #c4b5fd;
+    line-height: 1;
+}
+
+.hg-trend {
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.hg-better { color: #34d399; background: rgba(52, 211, 153, 0.1); }
+.hg-worse  { color: #f87171; background: rgba(248, 113, 113, 0.1); }
+.hg-same   { color: #94a3b8; background: rgba(148, 163, 184, 0.1); }
+
+.hg-svg {
+    display: block;
+    overflow: visible;
+}
+
+.hg-grid {
+    stroke: rgba(255,255,255,0.06);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+}
+
+.hg-line {
+    fill: none;
+    stroke: #a855f7;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.hg-dot {
+    fill: #7c3aed;
+    stroke: #1e1b4b;
+    stroke-width: 1.5;
+}
+
+.hg-dot-latest {
+    fill: #e879f9;
+    stroke: #1e1b4b;
+    stroke-width: 2;
+}
+
+.hg-label-latest {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    fill: #e879f9;
+}
+
+.hg-ylabel {
+    font-size: 9px;
+    fill: rgba(148,163,184,0.6);
+    text-anchor: end;
+}
+
+.hg-date {
+    font-size: 9px;
+    fill: rgba(148,163,184,0.5);
+    text-anchor: middle;
+}
+
+.hg-single {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 12px 0 4px;
 }
 
 .history-empty {
@@ -1588,4 +1676,15 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
         font-size: 0.85rem;
         padding: 12px;
     }
+}
+
+/* ── 모션 감소 설정 지원 ── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .pulse-ring { display: none; }
+    .page-enter { animation: none; }
 }

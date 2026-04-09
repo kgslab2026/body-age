@@ -123,6 +123,7 @@ export function startMemoryTest() {
     }
 
     function checkAnswer(input, sequence) {
+        if (!active) return;
         const wrongCount = sequence.filter((d, i) => d !== input[i]).length;
         if (wrongCount === 0) {
             if (span >= MAX_SPAN) {
