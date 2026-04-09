@@ -72,3 +72,38 @@ export function initTipsCard() {
         btn.querySelector('.tips-chevron').style.transform = open ? '' : 'rotate(180deg)';
     });
 }
+
+export function renderShareBtn(label, age) {
+    return `<button class="share-result-btn" id="share-result-btn" data-label="${label}" data-age="${age}">📤 결과 공유하기</button>`;
+}
+
+export function initShareBtn() {
+    const btn = document.getElementById('share-result-btn');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+        const label = btn.dataset.label;
+        const age   = btn.dataset.age;
+        const url   = 'https://kgslab2026.github.io/body-age/';
+        const text  = `신체 나이 측정기에서 내 ${label}을(를) 측정했더니 ${age}살!\n너도 해봐 👇`;
+        if (navigator.share) {
+            try { await navigator.share({ title: '신체 나이 측정기', text, url }); }
+            catch (e) { if (e.name !== 'AbortError') fallbackCopy(btn, `${text}\n${url}`); }
+        } else {
+            fallbackCopy(btn, `${text}\n${url}`);
+        }
+    });
+}
+
+function fallbackCopy(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✅ 복사됨!';
+        btn.style.borderColor = 'rgba(52,211,153,0.5)';
+        btn.style.color = '#34d399';
+        setTimeout(() => {
+            btn.textContent = orig;
+            btn.style.borderColor = '';
+            btn.style.color = '';
+        }, 2000);
+    });
+}

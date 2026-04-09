@@ -9,6 +9,23 @@ export function startBalanceTest() {
     let active = true;
     function goHome() { active = false; showMain(); }
 
+    if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
+        const html = `
+            <div class="test-box">
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <div class="mobile-only-box" style="margin-top:20px;">
+                    <div class="mobile-only-icon">📱</div>
+                    <div class="mobile-only-title">모바일 전용 테스트예요</div>
+                    <div class="mobile-only-desc">균형감각 테스트는 스마트폰의<br>자이로스코프 센서를 사용합니다.<br>모바일 기기에서 접속해 주세요!</div>
+                </div>
+            </div>
+        `;
+        navigate(html, () => {
+            document.getElementById('btn-home').onclick = goHome;
+        });
+        return;
+    }
+
     function showStart() {
         const html = `
             <div class="test-box">

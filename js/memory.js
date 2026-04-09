@@ -28,8 +28,7 @@ export function startMemoryTest() {
     }
 
     function runRound() {
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const sequence = Array.from({ length: span }, () => letters[Math.floor(Math.random() * letters.length)]);
+        const sequence = Array.from({ length: span }, () => String(Math.floor(Math.random() * 10)));
         showSequence(sequence, 0);
     }
 
@@ -85,10 +84,10 @@ export function startMemoryTest() {
                     : `<span class="mem-slot empty">_</span>`
             ).join('');
 
-            const keys = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '⌫', ''];
+            const keys = ['1','2','3','4','5','6','7','8','9','⌫','0',''];
             const pad = keys.map(k =>
                 k === '' ? `<div></div>` :
-                `<button class="mem-key letter-key" data-key="${k}">${k}</button>`
+                `<button class="mem-key" data-key="${k}">${k}</button>`
             ).join('');
 
             const html = `
