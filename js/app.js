@@ -4,17 +4,28 @@ import { startMemoryTest } from './memory.js';
 import { startBalanceTest } from './balance.js';
 import { startAttentionTest } from './attention.js';
 import { startVisionTest } from './vision.js';
+import { startNumberTest } from './number.js';
 import { calculator } from './calculator.js';
 import { showHistoryView } from './history.js';
 
 export const APP_URL = 'https://kgslab2026.github.io/body-age/';
+
+const ICONS = {
+    hearing: `<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><path d="M19 7c-6.5 0-11 5-11 11 0 4 1.8 7.5 4.5 9.5v7c0 2 1.5 3 3.5 3h2c2 0 3-1.5 3-3v-2c0-2 1-3 2.5-4.5C25.5 26.5 28 23 28 18c0-6.5-4-11-9-11z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M19 13c-3 0-5 2.5-5 5 0 2 1 3.5 2.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".6"/><path d="M31 14c2 2 3 4 3 6s-1 4.5-3 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/><path d="M35 10.5c3 3.5 4.5 7 4.5 9.5s-1.5 6.5-4.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".25"/></svg>`,
+    neural:  `<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><path d="M27 4L11 24h11L17 40 37 20H26z" fill="currentColor" opacity=".12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M27 4L11 24h11L17 40 37 20H26z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><line x1="5" y1="19" x2="9" y2="19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".4"/><line x1="4" y1="24" x2="8" y2="24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".3"/><line x1="5" y1="29" x2="9" y2="29" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".2"/></svg>`,
+    balance: `<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><circle cx="22" cy="8" r="4" stroke="currentColor" stroke-width="2"/><line x1="22" y1="12" x2="22" y2="26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="18" x2="34" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="26" x2="22" y2="38" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="28" x2="34" y2="35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="38" x2="29" y2="38" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".4"/></svg>`,
+    attention:`<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="17" stroke="currentColor" stroke-width="1.5" opacity=".3"/><circle cx="22" cy="22" r="10" stroke="currentColor" stroke-width="2" opacity=".65"/><circle cx="22" cy="22" r="3" fill="currentColor"/><line x1="22" y1="3" x2="22" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="22" y1="32" x2="22" y2="41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="3" y1="22" x2="12" y2="22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="32" y1="22" x2="41" y2="22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    vision:  `<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><path d="M4 22c4.5-10 9.5-14 18-14s13.5 4 18 14c-4.5 10-9.5 14-18 14S8.5 32 4 22z" stroke="currentColor" stroke-width="2"/><circle cx="22" cy="22" r="7" stroke="currentColor" stroke-width="2"/><circle cx="22" cy="22" r="3" fill="currentColor" opacity=".8"/><circle cx="25" cy="20" r="1.2" fill="currentColor" opacity=".5"/><line x1="22" y1="15" x2="22" y2="11" stroke="currentColor" stroke-width="1" opacity=".35"/><line x1="22" y1="29" x2="22" y2="33" stroke="currentColor" stroke-width="1" opacity=".35"/></svg>`,
+    brain:   `<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><path d="M22 8c-3.5 0-6.5 2-8 5.5-2.5.3-5 2.5-5 5.5 0 2 1 3.5 2.5 4.5-.5 2-.5 5.5 2 7.5 1 2 3 3 5.5 3.5V38h6v-3.5c2.5-.5 4.5-1.5 5.5-3.5 2.5-2 2.5-5.5 2-7.5 1.5-1 2.5-2.5 2.5-4.5 0-3-2.5-5.2-5-5.5C28.5 10 25.5 8 22 8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="16" cy="19" r="1.8" fill="currentColor" opacity=".7"/><circle cx="22" cy="16" r="1.8" fill="currentColor" opacity=".7"/><circle cx="28" cy="19" r="1.8" fill="currentColor" opacity=".7"/><circle cx="18.5" cy="26" r="1.8" fill="currentColor" opacity=".7"/><circle cx="25.5" cy="26" r="1.8" fill="currentColor" opacity=".7"/><line x1="16" y1="19" x2="22" y2="16" stroke="currentColor" stroke-width="1" opacity=".35"/><line x1="22" y1="16" x2="28" y2="19" stroke="currentColor" stroke-width="1" opacity=".35"/><line x1="16" y1="19" x2="18.5" y2="26" stroke="currentColor" stroke-width="1" opacity=".35"/><line x1="28" y1="19" x2="25.5" y2="26" stroke="currentColor" stroke-width="1" opacity=".35"/><line x1="18.5" y1="26" x2="25.5" y2="26" stroke="currentColor" stroke-width="1" opacity=".35"/></svg>`,
+    number:  `<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><rect x="12" y="12" width="20" height="20" rx="3" stroke="currentColor" stroke-width="2"/><rect x="17" y="17" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5" opacity=".5"/><line x1="17" y1="12" x2="17" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="22" y1="12" x2="22" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="27" y1="12" x2="27" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="17" y1="32" x2="17" y2="38" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="22" y1="32" x2="22" y2="38" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="27" y1="32" x2="27" y2="38" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="17" x2="6" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="22" x2="6" y2="22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="27" x2="6" y2="27" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="32" y1="17" x2="38" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="32" y1="22" x2="38" y2="22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="32" y1="27" x2="38" y2="27" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+};
 
 const app = document.getElementById('app');
 
 const STATE_KEY = 'bodyage_state';
 
 export const state = {
-    results: { hearing: null, neural: null, memory: null, balance: null, attention: null, vision: null },
+    results: { hearing: null, neural: null, memory: null, balance: null, attention: null, vision: null, number: null },
     save(key, value) {
         this.results[key] = value;
         try {
@@ -44,14 +55,14 @@ export function navigate(contentHtml, initFunction) {
 }
 
 const indicators = [
-    { id: 'hearing',   icon: '🎧', label: '청력 나이',    color: 'cyan',    available: true, action: startHearingTest, range: '15~80세' },
-    { id: 'neural',    icon: '⚡', label: '반응속도 나이', color: 'amber',   available: true, action: startNeuralTest,  range: '20~70세' },
-    { id: 'balance',   icon: '🦩', label: '균형감각 나이', color: 'emerald', available: true, action: startBalanceTest, range: '20~80세' },
-    { id: 'attention', icon: '🎯', label: '집중력 나이',   color: 'red',     available: true, action: startAttentionTest, range: '20~80세' },
-    { id: 'vision',    icon: '🔍', label: '시력 나이',     color: 'violet',  available: true, action: startVisionTest,  range: '20~80세' },
-    { id: 'brain',     icon: '🧠', label: '기억력 나이',   color: 'blue',    available: true, action: startMemoryTest,  range: '20~80세' },
-    { id: 'coming1',   icon: '🚧', label: '', color: 'gray',    available: false },
-    { id: 'coming2',   icon: '🚧', label: '', color: 'gray',    available: false },
+    { id: 'hearing',   icon: ICONS.hearing,   label: '청력 나이',    color: 'cyan',    available: true, action: startHearingTest,   range: '15~70세' },
+    { id: 'neural',    icon: ICONS.neural,    label: '반응속도 나이', color: 'amber',   available: true, action: startNeuralTest,    range: '15~70세' },
+    { id: 'balance',   icon: ICONS.balance,   label: '균형감각 나이', color: 'emerald', available: true, action: startBalanceTest,   range: '15~70세' },
+    { id: 'attention', icon: ICONS.attention, label: '집중력 나이',   color: 'red',     available: true, action: startAttentionTest, range: '15~70세' },
+    { id: 'vision',    icon: ICONS.vision,    label: '색감 나이',     color: 'violet',  available: true, action: startVisionTest,    range: '15~70세' },
+    { id: 'brain',     icon: ICONS.brain,     label: '기억력 나이',   color: 'blue',    available: true, action: startMemoryTest,    range: '15~70세' },
+    { id: 'number',    icon: ICONS.number,    label: '처리속도 나이',  color: 'orange',  available: true, action: startNumberTest,    range: '15~70세' },
+    { id: 'coming1',   icon: '🚧',            label: '',              color: 'gray',    available: false },
 ];
 
 // brain indicator의 결과는 state.results.memory에 저장됨
@@ -68,6 +79,7 @@ function getResultAge(id) {
         case 'balance':   return calculator.getBalanceAge(value);
         case 'attention': return calculator.getAttentionAge(value);
         case 'vision':    return calculator.getVisionAge(value);
+        case 'number':    return calculator.getNumberAge(value);
         default: return null;
     }
 }
@@ -102,7 +114,7 @@ function renderSummary() {
         <div class="summary-card">
             <div class="summary-header">
                 <span class="summary-title">⚡ BODY STATS</span>
-                <div style="display:flex; align-items:center; gap:10px;">
+                <div class="summary-meta">
                     <button id="summary-reset" class="summary-reset-btn" aria-label="모든 결과 초기화">RESET</button>
                     <span class="summary-avg">${avgAge}살</span>
                 </div>
@@ -129,10 +141,10 @@ function showFinalResult() {
         const html = `
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
-                <div style="font-size:3rem; margin:20px 0;">🏆</div>
-                <div style="font-size:1.3rem; font-weight:900; color:#f1f5f9;">아직 측정 결과가 없어요</div>
-                <p style="color:#64748b; margin-top:10px; line-height:1.7;">테스트를 하나 이상 완료하면<br>종합 결과를 볼 수 있어요!</p>
-                <button id="btn-home2" class="btn" style="width:100%; margin-top:24px;">테스트 시작하기</button>
+                <div class="empty-result-icon">🏆</div>
+                <div class="empty-result-title">아직 측정 결과가 없어요</div>
+                <p class="empty-result-copy">테스트를 하나 이상 완료하면<br>종합 결과를 볼 수 있어요!</p>
+                <button id="btn-home2" class="btn empty-result-cta">테스트 시작하기</button>
             </div>
         `;
         navigate(html, () => {
@@ -145,11 +157,11 @@ function showFinalResult() {
     const avgAge = Math.round(done.reduce((s, e) => s + e.age, 0) / done.length);
 
     const grade =
-        avgAge <= 22 ? { g: 'S', msg: '전설적인 신체 능력이에요!', color: '#fbbf24' } :
-        avgAge <= 32 ? { g: 'A', msg: '매우 젊고 건강한 신체예요!', color: '#34d399' } :
-        avgAge <= 42 ? { g: 'B', msg: '평균보다 젊은 신체예요',     color: '#60a5fa' } :
-        avgAge <= 55 ? { g: 'C', msg: '나이에 맞는 건강한 신체예요', color: '#a78bfa' } :
-                       { g: 'D', msg: '꾸준한 관리를 시작해보세요', color: '#fb923c' };
+        avgAge <= 22 ? { msg: '전설적인 신체 능력이에요!', color: '#fbbf24' } :
+        avgAge <= 32 ? { msg: '매우 젊고 건강한 신체예요!', color: '#34d399' } :
+        avgAge <= 42 ? { msg: '평균보다 젊은 신체예요',     color: '#60a5fa' } :
+        avgAge <= 55 ? { msg: '나이에 맞는 건강한 신체예요', color: '#a78bfa' } :
+                       { msg: '꾸준한 관리를 시작해보세요', color: '#fb923c' };
 
     const doneRows = done.map(e => {
         const pct = Math.max(5, Math.round((e.age / 80) * 100));
@@ -163,16 +175,16 @@ function showFinalResult() {
     }).join('');
 
     const pendingRows = pending.map(e => `
-        <div class="final-row" style="opacity:0.35;">
+        <div class="final-row final-row-pending">
             <span class="final-icon">${e.icon}</span>
             <span class="final-label">${e.label}</span>
             <div class="final-bar-bg"></div>
-            <span class="final-age" style="font-size:11px; color:#475569;">미측정</span>
+            <span class="final-age final-age-pending">미측정</span>
         </div>`
     ).join('');
 
     const pendingNote = pending.length > 0
-        ? `<p style="font-size:12px; color:#475569; text-align:center; margin:0 0 10px;">* ${pending.length}개 미완료 — 모두 측정하면 더 정확해져요</p>`
+        ? `<p class="final-note">* ${pending.length}개 미완료 — 모두 측정하면 더 정확해져요</p>`
         : '';
 
     const shareLabels = done.map(e => e.label).join('·');
@@ -181,17 +193,22 @@ function showFinalResult() {
     const html = `
         <div class="final-box">
             <div class="final-header">
-                <div class="final-grade" style="color:${grade.color}">${grade.g}</div>
                 <div class="final-avg-label">종합 신체 나이 (${done.length}/${indicators.filter(i => i.available).length})</div>
                 <div class="final-avg">${avgAge}살</div>
-                <div class="final-msg">${grade.msg}</div>
             </div>
             <div class="final-rows">${doneRows}${pendingRows}</div>
             ${pendingNote}
-            <button id="final-save"  class="save-img-btn">📸 이미지로 저장</button>
-            <button id="final-share" class="share-fab">📤 결과 공유하기</button>
-            <button id="final-history" class="history-fab">📋 이전 기록 보기</button>
-            <button id="final-home" class="btn" style="width:100%; margin-top:4px; background:#1e293b;">처음으로</button>
+            <div class="final-actions">
+                <button id="final-save" class="save-img-btn">📸 이미지로 저장</button>
+                <div class="final-share-row">
+                    <button id="final-share" class="share-fab">📤 결과 공유하기</button>
+                    <button id="final-recommend" class="share-fab">🔗 친구에게 추천하기</button>
+                </div>
+            </div>
+            <div class="final-sub-actions">
+                <button id="final-history" class="history-fab">📋 이전 기록 보기</button>
+                <button id="final-home" class="btn final-home-btn">처음으로</button>
+            </div>
         </div>
     `;
 
@@ -208,6 +225,7 @@ function showFinalResult() {
                 copyFinalLink(btn, `${shareText}\n${APP_URL}`);
             }
         });
+        document.getElementById('final-recommend').addEventListener('click', shareApp);
     });
 }
 
@@ -265,23 +283,17 @@ function drawResultCard(done, avgAge, grade) {
     y += 42;
 
     // 앱 이름
-    ctx.fillStyle = '#64748b';
+    ctx.fillStyle = '#94a3b8';
     ctx.font = '400 13px "Noto Sans KR", sans-serif';
     ctx.fillText('신체 나이 측정기 · KGS Lab', pad, y);
     y += 34;
 
-    // 등급
-    ctx.fillStyle = grade.color;
-    ctx.font = '900 68px "Space Grotesk", sans-serif';
+    // 헤더 간격
     ctx.textAlign = 'center';
-    ctx.shadowColor = grade.color;
-    ctx.shadowBlur = 24;
-    ctx.fillText(grade.g, W / 2, y + 56);
-    ctx.shadowBlur = 0;
-    y += 72;
+    y += 18;
 
     // 종합 나이 라벨
-    ctx.fillStyle = '#64748b';
+    ctx.fillStyle = '#94a3b8';
     ctx.font = '700 12px "Noto Sans KR", sans-serif';
     ctx.fillText(`종합 신체 나이 (${done.length}/${indicators.filter(i => i.available).length})`, W / 2, y);
     y += 20;
@@ -292,11 +304,7 @@ function drawResultCard(done, avgAge, grade) {
     ctx.fillText(`${avgAge}살`, W / 2, y + 34);
     y += 48;
 
-    // 메시지
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '400 13px "Noto Sans KR", sans-serif';
-    ctx.fillText(grade.msg, W / 2, y);
-    y += 26;
+    y += 8;
 
     // 구분선
     ctx.strokeStyle = 'rgba(255,255,255,0.08)';
@@ -458,15 +466,20 @@ export function showMain() {
         if (done) completedCount++;
 
         return `
-            <div class="indicator-card card-${item.color} ${item.available ? 'available' : 'locked'}"
+            <div class="indicator-card card-${item.color} ${item.available ? 'available' : 'locked'} ${done ? 'completed' : ''}"
                  id="card-${item.id}" ${item.available ? `aria-label="${item.label} 테스트 시작"` : `aria-label="준비중"`}>
                 <div class="card-icon">${item.icon}</div>
                 <div class="card-label">${item.label}</div>
                 ${item.range ? `<div class="card-range">${item.range}</div>` : ''}
                 ${!item.available ? `<div class="badge-soon">COMING SOON</div>` : ''}
+                ${done ? `<div class="check-badge">✓</div>` : ''}
             </div>
         `;
     }).join('');
+
+    const progressSegments = Array.from({ length: availableCount }, (_, idx) => (
+        `<span class="progress-segment ${idx < completedCount ? 'filled' : ''}" aria-hidden="true"></span>`
+    )).join('');
 
     const html = `
         <div class="main-box">
@@ -484,8 +497,15 @@ export function showMain() {
             </div>
             ${renderSummary()}
             <button id="btn-final" class="final-fab" aria-label="종합 결과 보기">🏆 종합 결과 보기 ${completedCount > 0 ? `(${completedCount}/${availableCount})` : ''}</button>
-            <button id="btn-share" class="share-fab" aria-label="앱 추천하기">🔗 친구에게 추천하기</button>
-            <div class="section-label">지표 선택 · ${completedCount}/${availableCount} 완료</div>
+            <div class="progress-section">
+                <div class="section-label-wrapper">
+                    <div class="section-label">지표 선택</div>
+                    <span class="progress-count">${completedCount}/${availableCount}</span>
+                </div>
+                <div class="progress-steps" aria-label="지표 진행도 ${completedCount}/${availableCount}">
+                    ${progressSegments}
+                </div>
+            </div>
             <div class="card-grid">${cards}</div>
             <footer class="app-footer">
                 <a href="privacy.html" class="footer-link">개인정보처리방침</a>
@@ -507,7 +527,6 @@ export function showMain() {
         });
         document.getElementById('btn-final')?.addEventListener('click', showFinalResult);
         document.getElementById('btn-history')?.addEventListener('click', showHistoryView);
-        document.getElementById('btn-share').addEventListener('click', shareApp);
         document.getElementById('summary-reset')?.addEventListener('click', () => {
             state.clear();
             showMain();

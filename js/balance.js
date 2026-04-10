@@ -13,7 +13,7 @@ export function startBalanceTest() {
         const html = `
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
-                <div class="mobile-only-box" style="margin-top:20px;">
+                <div class="mobile-only-box with-top-gap">
                     <div class="mobile-only-icon">📱</div>
                     <div class="mobile-only-title">모바일 전용 테스트예요</div>
                     <div class="mobile-only-desc">균형감각 테스트는 스마트폰의<br>자이로스코프 센서를 사용합니다.<br>모바일 기기에서 접속해 주세요!</div>
@@ -30,17 +30,17 @@ export function startBalanceTest() {
         const html = `
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
-                <h2 style="color: var(--primary-color); margin-top: 10px;">균형감각 테스트</h2>
-                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 20살 ~ 80살</div>
-                <p style="line-height: 1.8;">
-                    📱 폰을 앞으로 들고<br>
+                <h2 class="test-title-accent">균형감각 테스트</h2>
+                <div class="test-range-pill">측정 범위: 15살 ~ 70살</div>
+                <p class="test-copy-relaxed">
+                    📱 화면이 위를 향하도록 폰을 수평으로 들고<br>
                     <strong>한 발로 서서 ${TEST_DURATION}초</strong> 버텨보세요!<br><br>
                     폰의 흔들림으로 균형감각을 측정합니다.
                 </p>
-                <div style="background: rgba(108,99,255,0.07); border-radius: 14px; padding: 14px 16px; width: 100%; margin-top: 8px; font-size: 0.85rem; color: #888; line-height: 1.6;">
+                <div class="test-note-card">
                     ⚠️ 안전한 곳에서 넘어지지 않게 주의하세요
                 </div>
-                <button id="start-btn" class="btn" style="margin-top: 24px; width: 100%;">준비 완료</button>
+                <button id="start-btn" class="btn btn-start-wide">준비 완료</button>
             </div>
         `;
         navigate(html, () => {
@@ -68,10 +68,10 @@ export function startBalanceTest() {
         const html = `
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
-                <div style="font-size: 3rem; margin: 20px auto; text-align:center; width:100%;">⚠️</div>
-                <div style="font-size: 1.2rem; font-weight: bold; color: #f87171; text-align:center; width:100%;">센서 권한이 필요합니다</div>
-                <p style="color: #888; text-align:center; width:100%;">설정 → Safari → 동작 및 방향 접근 허용</p>
-                <button id="back-btn" class="btn" style="margin-top: 24px; width: 100%;">돌아가기</button>
+                <div class="test-center-icon">⚠️</div>
+                <div class="test-error-title">센서 권한이 필요합니다</div>
+                <p class="test-error-desc">설정 → Safari → 동작 및 방향 접근 허용</p>
+                <button id="back-btn" class="btn btn-start-wide">돌아가기</button>
             </div>
         `;
         navigate(html, () => {
@@ -85,9 +85,9 @@ export function startBalanceTest() {
         if (count === 0) { runTest(); return; }
         const html = `
             <div class="balance-display">
-                <button class="btn-home" id="btn-home" style="position:absolute; top:16px; left:16px;"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home btn-home-overlay" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
                 <div class="balance-countdown">${count}</div>
-                <div style="color:rgba(255,255,255,0.5); font-size:0.95rem;">한 발로 서세요!</div>
+                <div class="countdown-hint">한 발로 서세요!</div>
             </div>
         `;
         navigate(html, () => {
@@ -118,7 +118,7 @@ export function startBalanceTest() {
                     <div class="balance-ring"></div>
                     <div class="balance-dot" id="bal-dot"></div>
                 </div>
-                <div style="color:rgba(255,255,255,0.5); font-size:0.9rem;">최대한 안정적으로!</div>
+                <div class="balance-live-hint">최대한 안정적으로!</div>
             </div>
         `;
 
@@ -177,15 +177,15 @@ export function startBalanceTest() {
         const html = `
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
-                <div style="font-size: 3rem; margin: 20px auto; text-align:center; width:100%;">📱</div>
-                <div style="font-size: 1.2rem; font-weight: bold; color: #f87171; width:100%; text-align:center;">센서를 감지할 수 없어요</div>
-                <p style="color: #888; text-align:center; width:100%; line-height: 1.6;">
+                <div class="test-center-icon">📱</div>
+                <div class="test-error-title">센서를 감지할 수 없어요</div>
+                <p class="test-error-desc">
                     이 기기는 자이로스코프를 지원하지 않거나, 권한이 거부되었어요.<br>
                     설정에서 모션 센서 권한을 허용하고 다시 시도해주세요.
                 </p>
-                <div style="display: flex; gap: 10px; width: 100%; margin-top: 20px;">
-                    <button id="retry-btn" class="btn" style="flex:1; background: #fbbf24; color: #1e293b;">재시도</button>
-                    <button id="back-btn" class="btn" style="flex:1;">돌아가기</button>
+                <div class="test-action-row">
+                    <button id="retry-btn" class="btn btn-warn">재시도</button>
+                    <button id="back-btn" class="btn btn-flex">돌아가기</button>
                 </div>
             </div>
         `;
@@ -199,21 +199,21 @@ export function startBalanceTest() {
     function showResult(sway) {
         if (!active) return;
         const age = calculator.getBalanceAge(sway);
-        const ageLabel = age >= 80 ? '80살 이상' : `${age}살~${age + 4}살`;
+        const ageLabel = `${age}살`;
         state.save('balance', sway);
         saveResult('balance', age, `${sway.toFixed(1)}°`);
 
         const html = `
             <div class="result-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
-                <h2 style="font-size: 1.8rem; margin-top: 10px;">측정 결과</h2>
+                <h2 class="result-title">측정 결과</h2>
                 <div class="age-result" style="font-size: 48px;">${ageLabel}</div>
-                <p style="color:#888; margin: 5px 0 12px;">흔들림 수치: <strong style="color:var(--text-color);">${sway.toFixed(1)}°</strong></p>
+                <p class="result-sub-note">흔들림 수치: <strong>${sway.toFixed(1)}°</strong></p>
                 ${renderHistoryInline('balance')}
                 ${renderTipsCard('balance')}
-                <div style="display: flex; gap: 15px; width: 100%; margin-top: 12px;">
-                    <button id="retry-btn" class="btn" style="flex:1; background: #475569;">다시하기</button>
-                    <button id="next-btn" class="btn" style="flex:1;">다음 단계</button>
+                <div class="test-action-row test-action-row--compact">
+                    <button id="retry-btn" class="btn btn-ghost-light">다시하기</button>
+                    <button id="next-btn" class="btn btn-flex">다음 단계</button>
                 </div>
             </div>
         `;

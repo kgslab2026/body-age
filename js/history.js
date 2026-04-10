@@ -21,6 +21,13 @@ function persist(data) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+function clearByKey(key) {
+    const data = load();
+    if (!data[key]) return;
+    delete data[key];
+    persist(data);
+}
+
 export function saveResult(key, age, raw = null) {
     const data = load();
     if (!data[key]) data[key] = [];
@@ -168,6 +175,7 @@ export function showHistoryView() {
                     <span class="history-section-icon">${meta.icon}</span>
                     <span class="history-section-label">${meta.label}</span>
                     <span class="history-section-count">${entries.length}회</span>
+                    <button class="history-section-clear-btn" data-key="${key}" aria-label="${meta.label} 기록 삭제">지우기</button>
                 </div>
                 <div class="hg-summary">
                     <span class="hg-latest-age">${latest.age}살</span>
@@ -193,10 +201,23 @@ export function showHistoryView() {
 
     navigate(html, () => {
         document.getElementById('btn-home').onclick = showMain;
+
+        document.querySelectorAll('.history-section-clear-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.dataset.key;
+                if (!key) return;
+                const label = LABELS[key]?.label ?? '해당 지표';
+                if (confirm(`${label} 기록만 삭제할까요?`)) {
+                    clearByKey(key);
+                    showHistoryView();
+                }
+            });
+        });
+
         document.getElementById('clear-history-btn')?.addEventListener('click', () => {
             if (confirm('모든 기록을 삭제할까요?')) {
                 localStorage.removeItem(STORAGE_KEY);
-                showMain();
+                showHistoryView();
             }
         });
     });

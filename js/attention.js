@@ -23,10 +23,10 @@ export function startAttentionTest() {
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
                 <h2 style="color: var(--primary-color); margin-top: 10px;">집중력 테스트</h2>
-                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 20살 ~ 80살</div>
+                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 15살 ~ 70살</div>
                 <p style="line-height: 1.8;">단어의 <strong>색깔</strong>을 탭하세요.<br>단어의 의미는 무시하세요!</p>
                 <div style="background: #1e293b; border-radius: 20px; padding: 20px; width: 100%; margin: 4px 0; text-align: center;">
-                    <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 10px; letter-spacing: 1px;">예시 — 이 글자의 색은?</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 10px; letter-spacing: 1px;">예시 — 이 글자의 색은?</div>
                     <div style="font-size: 52px; font-weight: 900; color: ${exInk.hex}; line-height: 1;">${exWord.name}</div>
                     <div style="margin-top: 12px; display: inline-block; background: ${exInk.hex}; color: ${exInk.text}; font-size: 0.9rem; font-weight: 900; padding: 6px 18px; border-radius: 999px;">정답: ${exInk.name}</div>
                 </div>
@@ -130,13 +130,10 @@ export function startAttentionTest() {
             return;
         }
 
-        // 평균 반응시간 + 오답 1개당 300ms 누적 페널티
-        // (오답 10개 × 300 = 3000ms → 2600ms 상한 초과 → 최고령 보장)
-        const avgRawTime    = Math.round(results.reduce((s, r) => s + r.time, 0) / results.length);
-        const effectiveTime = Math.min(2600, avgRawTime + wrongCount * 300);
-        const age = calculator.getAttentionAge(effectiveTime);
+        const avgRawTime = Math.round(results.reduce((s, r) => s + r.time, 0) / results.length);
+        const age = calculator.getAttentionAge(correctCount, avgRawTime);
 
-        state.save('attention', effectiveTime);
+        state.save('attention', avgRawTime);
         saveResult('attention', age, `${avgRawTime}ms`);
 
         const html = `
@@ -147,7 +144,6 @@ export function startAttentionTest() {
                 <p style="color:#888; margin: 5px 0 12px;">
                     정답 <strong style="color:${wrongCount === 0 ? '#34d399' : 'var(--text-color)'};">${correctCount}/${TOTAL_ROUNDS}</strong>
                     · 반응시간 <strong style="color:var(--text-color);">${avgRawTime} ms</strong>
-                    ${wrongCount > 0 ? `· 오답 페널티 <strong style="color:#f87171;">+${wrongCount * 300} ms</strong>` : ''}
                 </p>
                 ${renderHistoryInline('attention')}
                 ${renderTipsCard('attention')}

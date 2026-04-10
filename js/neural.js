@@ -4,6 +4,7 @@ import { renderTipsCard, initTipsCard } from './tips.js';
 import { saveResult, renderHistoryInline } from './history.js';
 
 const TOTAL_ROUNDS = 5;
+const LATE_THRESHOLD = 600;
 
 export function startNeuralTest() {
     const times = [];
@@ -16,7 +17,7 @@ export function startNeuralTest() {
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
                 <h2 style="color: var(--primary-color); margin-top: 10px;">반응속도 테스트</h2>
-                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 20살 ~ 70살</div>
+                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 15살 ~ 70살</div>
                 <p style="line-height: 1.8;">화면이 <strong style="color:#22c55e;">초록색</strong>으로 바뀌는 순간<br>최대한 빠르게 탭하세요!<br><br>총 ${TOTAL_ROUNDS}번 측정 후 평균으로 계산합니다.</p>
                 <button id="start-btn" class="btn" style="margin-top: 30px; width: 100%;">준비 완료</button>
             </div>
@@ -49,32 +50,71 @@ export function startNeuralTest() {
 
             const box = document.getElementById('reaction-box');
             const delay = 1500 + Math.random() * 2500;
+            let tapPending = false; // rAF 완료 전 탭 여부
 
             timer = setTimeout(() => {
                 waiting = false;
-                startTime = performance.now();
                 box.classList.remove('waiting');
                 box.classList.add('go');
                 box.querySelector('.reaction-icon').textContent = '👆';
                 box.querySelector('.reaction-msg').textContent = '지금!';
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        startTime = performance.now();
+                        if (tapPending) {
+                            // rAF 완료 전에 탭이 이미 왔었으면 즉시 처리
+                            const elapsed = 0;
+                            times.push(elapsed);
+                            if (round >= TOTAL_ROUNDS) {
+                                showResult();
+                            } else {
+                                round++;
+                                runRound();
+                            }
+                        }
+                    });
+                });
             }, delay);
 
-            box.addEventListener('click', () => {
+            box.addEventListener('pointerdown', () => {
                 if (waiting) {
                     clearTimeout(timer);
                     showEarlyTap();
-                } else if (startTime !== null) {
+                } else if (startTime === null) {
+                    // go 상태이지만 rAF 아직 미완료 → 탭 예약
+                    tapPending = true;
+                } else {
                     const elapsed = Math.round(performance.now() - startTime);
                     startTime = null;
-                    times.push(elapsed);
-                    if (round >= TOTAL_ROUNDS) {
-                        showResult();
+                    if (elapsed >= LATE_THRESHOLD) {
+                        showLateTap();
                     } else {
-                        round++;
-                        runRound();
+                        times.push(elapsed);
+                        if (round >= TOTAL_ROUNDS) {
+                            showResult();
+                        } else {
+                            round++;
+                            runRound();
+                        }
                     }
                 }
             });
+        });
+    }
+
+    function showLateTap() {
+        const html = `
+            <div class="test-box">
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <div style="font-size: 3rem; margin: 20px 0;">⏱️</div>
+                <div style="font-size: 1.4rem; font-weight: bold; color: #f87171;">너무 늦었어요!</div>
+                <p style="color: #888; margin-top: 10px;">다시 측정합니다.</p>
+                <button id="retry-btn" class="btn" style="margin-top: 30px; width: 100%;">다시 시도</button>
+            </div>
+        `;
+        navigate(html, () => {
+            document.getElementById('btn-home').onclick = goHome;
+            document.getElementById('retry-btn').onclick = () => runRound();
         });
     }
 

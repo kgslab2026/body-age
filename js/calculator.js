@@ -1,13 +1,13 @@
 export const calculator = {
-    // 출처: Human Benchmark (수백만 명 실측 평균)
     reactionData: [
-        { ms: 220, age: 20 },  // 18-24세 평균(255ms) 이하 하한선
-        { ms: 255, age: 24 },  // 18-24세 실측 평균 (최고 구간)
-        { ms: 262, age: 30 },  // 25-34세 실측 평균
-        { ms: 275, age: 40 },  // 35-44세 실측 평균
-        { ms: 296, age: 50 },  // 45-54세 실측 평균
-        { ms: 330, age: 60 },  // 55-64세 실측 평균
-        { ms: 376, age: 70 },  // 65세+ 실측 평균
+        { ms: 200, age: 15 },
+        { ms: 215, age: 18 },
+        { ms: 255, age: 22 },
+        { ms: 262, age: 30 },
+        { ms: 275, age: 40 },
+        { ms: 296, age: 50 },
+        { ms: 330, age: 60 },
+        { ms: 376, age: 70 },
     ],
 
     getReactionAge(ms) {
@@ -26,15 +26,18 @@ export const calculator = {
     },
 
 
-    // 숫자 기억 폭(Digit Span) → 나이 (10살 단위, -5살 보너스와 조합해 5살 단위 세분화)
+    // 숫자 기억 폭(Digit Span) → 나이
     memoryData: [
-        { span: 3, age: 80 },
-        { span: 4, age: 70 },
-        { span: 5, age: 60 },
-        { span: 6, age: 50 },
-        { span: 7, age: 40 },
-        { span: 8, age: 30 },
-        { span: 9, age: 20 },
+        { span: 3,  age: 70 },
+        { span: 4,  age: 63 },
+        { span: 5,  age: 56 },
+        { span: 6,  age: 49 },
+        { span: 7,  age: 42 },
+        { span: 8,  age: 35 },
+        { span: 9,  age: 28 },
+        { span: 10, age: 21 },
+        { span: 11, age: 18 },
+        { span: 12, age: 15 },
     ],
 
     getMemoryAge(span) {
@@ -52,62 +55,93 @@ export const calculator = {
         return 80;
     },
 
-    // 엑셀 데이터 + 80세 확장 데이터
+    // 나이별 최대 가청 주파수 (15~70세, 1살 단위, 5세 앵커 사이 선형 보간)
+    // 앵커: 15→20000, 20→18000, 25→17000, 30→16000, 35→15000, 40→14000,
+    //        45→13000, 50→12000, 55→11000, 60→10000, 65→9000, 70→8000 (Hz)
     hearingData: [
         { hz: 20000, age: 15 },
-        { hz: 19000, age: 20 },
-        { hz: 17000, age: 24 },
-        { hz: 15000, age: 29 },
-        { hz: 14000, age: 34 },
-        { hz: 12000, age: 44 },
-        { hz: 10000, age: 54 },
-        { hz: 8000,  age: 64 },
-        { hz: 1000,  age: 80 }  // 80세 기준점
+        { hz: 19600, age: 16 },
+        { hz: 19200, age: 17 },
+        { hz: 18800, age: 18 },
+        { hz: 18400, age: 19 },
+        { hz: 18000, age: 20 },
+        { hz: 17800, age: 21 },
+        { hz: 17600, age: 22 },
+        { hz: 17400, age: 23 },
+        { hz: 17200, age: 24 },
+        { hz: 17000, age: 25 },
+        { hz: 16800, age: 26 },
+        { hz: 16600, age: 27 },
+        { hz: 16400, age: 28 },
+        { hz: 16200, age: 29 },
+        { hz: 16000, age: 30 },
+        { hz: 15800, age: 31 },
+        { hz: 15600, age: 32 },
+        { hz: 15400, age: 33 },
+        { hz: 15200, age: 34 },
+        { hz: 15000, age: 35 },
+        { hz: 14800, age: 36 },
+        { hz: 14600, age: 37 },
+        { hz: 14400, age: 38 },
+        { hz: 14200, age: 39 },
+        { hz: 14000, age: 40 },
+        { hz: 13800, age: 41 },
+        { hz: 13600, age: 42 },
+        { hz: 13400, age: 43 },
+        { hz: 13200, age: 44 },
+        { hz: 13000, age: 45 },
+        { hz: 12800, age: 46 },
+        { hz: 12600, age: 47 },
+        { hz: 12400, age: 48 },
+        { hz: 12200, age: 49 },
+        { hz: 12000, age: 50 },
+        { hz: 11800, age: 51 },
+        { hz: 11600, age: 52 },
+        { hz: 11400, age: 53 },
+        { hz: 11200, age: 54 },
+        { hz: 11000, age: 55 },
+        { hz: 10800, age: 56 },
+        { hz: 10600, age: 57 },
+        { hz: 10400, age: 58 },
+        { hz: 10200, age: 59 },
+        { hz: 10000, age: 60 },
+        { hz:  9800, age: 61 },
+        { hz:  9600, age: 62 },
+        { hz:  9400, age: 63 },
+        { hz:  9200, age: 64 },
+        { hz:  9000, age: 65 },
+        { hz:  8800, age: 66 },
+        { hz:  8600, age: 67 },
+        { hz:  8400, age: 68 },
+        { hz:  8200, age: 69 },
+        { hz:  8000, age: 70 },
     ],
 
-    // 시력 (색각 정답 개수 0~8) → 나이
-    getVisionAge(correct) {
-        const ageMap = [80, 75, 65, 55, 45, 35, 27, 23, 20];
-        return ageMap[Math.min(correct, 8)];
+    // 색감 (정답 개수 0~8) → 나이
+    getVisionAge(correct, partial = false) {
+        const ageMap = [70, 63, 56, 49, 42, 35, 28, 21, 15];
+        const age = ageMap[Math.min(correct, 8)];
+        return partial ? Math.max(age - 3, 15) : age;
     },
 
-    // 집중력 (스트룹 테스트 평균 반응시간 ms, 오답 +500ms 페널티) → 나이
-    // 출처: Stroop 테스트 연령별 반응시간 연구 기반
-    attentionData: [
-        { ms: 700,  age: 20 },
-        { ms: 900,  age: 30 },
-        { ms: 1100, age: 40 },
-        { ms: 1400, age: 50 },
-        { ms: 1700, age: 60 },
-        { ms: 2100, age: 70 },
-        { ms: 2600, age: 80 },
-    ],
+    // 집중력 (스트룹 테스트 정답 개수 0~10) → 나이
+    attentionAgeMap: [70, 70, 63, 56, 49, 42, 35, 28, 21, 18, 15],
 
-    getAttentionAge(ms) {
-        const data = this.attentionData;
-        if (ms <= data[0].ms) return data[0].age;
-        if (ms >= data[data.length - 1].ms) return data[data.length - 1].age;
-        for (let i = 0; i < data.length - 1; i++) {
-            const low = data[i];
-            const high = data[i + 1];
-            if (ms >= low.ms && ms <= high.ms) {
-                const ratio = (ms - low.ms) / (high.ms - low.ms);
-                return Math.round(low.age + (high.age - low.age) * ratio);
-            }
-        }
-        return 80;
+    getAttentionAge(correctCount, avgMs) {
+        const age = this.attentionAgeMap[Math.min(correctCount, 10)];
+        return avgMs >= 1500 ? Math.min(age + 3, 70) : age;
     },
 
     // 균형감각 (자이로스코프 흔들림 표준편차 °) → 나이
     // 출처: Berg Balance Scale + postural sway 연구 기반 추정
     balanceData: [
-        { sway: 2.0,  age: 20 },
-        { sway: 4.0,  age: 30 },
-        { sway: 6.0,  age: 40 },
-        { sway: 8.5,  age: 50 },
-        { sway: 11.0, age: 60 },
-        { sway: 14.0, age: 70 },
-        { sway: 18.0, age: 80 },
+        { sway: 2.0,  age: 15 },
+        { sway: 4.0,  age: 25 },
+        { sway: 6.0,  age: 35 },
+        { sway: 8.5,  age: 45 },
+        { sway: 11.0, age: 55 },
+        { sway: 14.0, age: 63 },
+        { sway: 18.0, age: 70 },
     ],
 
     getBalanceAge(sway) {
@@ -120,10 +154,10 @@ export const calculator = {
             if (sway >= low.sway && sway <= high.sway) {
                 const ratio = (sway - low.sway) / (high.sway - low.sway);
                 const age = low.age + (high.age - low.age) * ratio;
-                return Math.round(age / 5) * 5;
+                return Math.round(age);
             }
         }
-        return 80;
+        return 70;
     },
 
     getHearingAge(hz) {
@@ -144,6 +178,32 @@ export const calculator = {
                 return Math.round(age);
             }
         }
-        return 80; // 기본값
+        return 70; // 기본값
+    },
+
+    // 숫자 순서 찾기 (평균 소요시간 ms) → 나이
+    numberData: [
+        { ms: 13000, age: 15 },
+        { ms: 16000, age: 20 },
+        { ms: 19000, age: 30 },
+        { ms: 24000, age: 40 },
+        { ms: 31000, age: 50 },
+        { ms: 40000, age: 60 },
+        { ms: 60000, age: 70 },
+    ],
+
+    getNumberAge(ms) {
+        const data = this.numberData;
+        if (ms <= data[0].ms) return data[0].age;
+        if (ms >= data[data.length - 1].ms) return data[data.length - 1].age;
+        for (let i = 0; i < data.length - 1; i++) {
+            const low = data[i];
+            const high = data[i + 1];
+            if (ms >= low.ms && ms <= high.ms) {
+                const ratio = (ms - low.ms) / (high.ms - low.ms);
+                return Math.round(low.age + (high.age - low.age) * ratio);
+            }
+        }
+        return 70;
     }
 };

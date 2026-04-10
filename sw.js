@@ -14,6 +14,7 @@ const ASSETS = [
     BASE + 'js/history.js',
     BASE + 'js/memory.js',
     BASE + 'js/neural.js',
+    BASE + 'js/number.js',
     BASE + 'js/tips.js',
     BASE + 'js/vision.js',
     BASE + 'icon-192.png',

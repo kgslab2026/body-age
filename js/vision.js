@@ -22,18 +22,18 @@ export function startVisionTest() {
         const exHue = 200;
         const exBase   = `hsl(${exHue}, 65%, 54%)`;
         const exTarget = `hsl(${exHue + 30}, 65%, 54%)`;
-        const exIdx = 4;
+        const exIdxs = [2, 6];
 
         const exCells = Array.from({ length: 9 }, (_, i) =>
-            `<div style="background:${i === exIdx ? exTarget : exBase}; width:52px; height:52px; border-radius:10px;"></div>`
+            `<div style="background:${exIdxs.includes(i) ? exTarget : exBase}; width:52px; height:52px; border-radius:10px;"></div>`
         ).join('');
 
         const html = `
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
-                <h2 style="color: var(--primary-color); margin-top: 10px;">시력 나이</h2>
-                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 20살 ~ 80살</div>
-                <p style="line-height: 1.8;">9개 중 <strong>색이 다른 하나</strong>를 찾아 탭하세요.<br>점점 차이가 줄어들어 어려워집니다!</p>
+                <h2 style="color: var(--primary-color); margin-top: 10px;">색감 나이</h2>
+                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 15살 ~ 70살</div>
+                <p style="line-height: 1.8;">9개 중 <strong>색이 다른 두 개</strong>를 찾아 탭하세요.<br>점점 차이가 줄어들어 어려워집니다!</p>
                 <div style="background: #1e293b; border-radius: 20px; padding: 20px; width: 100%; margin: 8px 0; display: flex; flex-direction: column; align-items: center; gap: 12px;">
                     <div style="font-size: 0.75rem; color: #64748b; letter-spacing: 1px;">예시</div>
                     <div style="display: grid; grid-template-columns: repeat(3, 52px); gap: 8px;">${exCells}</div>
@@ -63,10 +63,14 @@ export function startVisionTest() {
             const hue = Math.floor(Math.random() * 360);
             const baseColor   = `hsl(${hue}, 62%, 54%)`;
             const targetColor = `hsl(${(hue + offset) % 360}, 62%, 54%)`;
-            const targetIdx   = Math.floor(Math.random() * 9);
+            const targetIdxs  = [];
+            while (targetIdxs.length < 2) {
+                const r = Math.floor(Math.random() * 9);
+                if (!targetIdxs.includes(r)) targetIdxs.push(r);
+            }
 
             const cells = Array.from({ length: 9 }, (_, i) =>
-                `<div class="vision-cell" data-idx="${i}" style="background:${i === targetIdx ? targetColor : baseColor};"></div>`
+                `<div class="vision-cell" data-idx="${i}" style="background:${targetIdxs.includes(i) ? targetColor : baseColor};"></div>`
             ).join('');
 
             const html = `
@@ -74,27 +78,33 @@ export function startVisionTest() {
                     <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
                     <div class="vision-progress">${roundIdx + 1} / ${LEVELS.length}</div>
                     <div class="vision-grid">${cells}</div>
-                    <div class="vision-label">색이 다른 하나를 탭하세요</div>
+                    <div class="vision-label">색이 다른 두 개를 탭하세요</div>
                 </div>
             `;
 
             navigate(html, () => {
                 document.getElementById('btn-home').onclick = goHome;
+                let tappedCount = 0;
+                let hits = 0;
                 document.querySelectorAll('.vision-cell').forEach(cell => {
                     cell.onclick = () => {
                         if (!active) return;
-                        const correct = parseInt(cell.dataset.idx) === targetIdx;
-
-                        document.querySelectorAll('.vision-cell').forEach(c => {
-                            c.style.pointerEvents = 'none';
-                            if (parseInt(c.dataset.idx) === targetIdx) {
-                                c.style.background = '#22c55e';
-                            }
-                        });
-                        if (!correct) cell.style.background = '#ef4444';
-
-                        results.push({ correct });
-                        setTimeout(nextRound, 500);
+                        const idx = parseInt(cell.dataset.idx);
+                        const isTarget = targetIdxs.includes(idx);
+                        cell.style.pointerEvents = 'none';
+                        cell.style.background = isTarget ? '#22c55e' : '#ef4444';
+                        if (isTarget) hits++;
+                        tappedCount++;
+                        if (tappedCount === 2) {
+                            document.querySelectorAll('.vision-cell').forEach(c => {
+                                c.style.pointerEvents = 'none';
+                                if (targetIdxs.includes(parseInt(c.dataset.idx))) {
+                                    c.style.background = '#22c55e';
+                                }
+                            });
+                            results.push({ hits });
+                            setTimeout(nextRound, 500);
+                        }
                     };
                 });
             });
@@ -105,8 +115,9 @@ export function startVisionTest() {
 
     function showResult(results) {
         if (!active) return;
-        const correctCount = results.filter(r => r.correct).length;
-        const age = calculator.getVisionAge(correctCount);
+        const correctCount = results.filter(r => r.hits === 2).length;
+        const partialCount = results.filter(r => r.hits === 1).length;
+        const age = calculator.getVisionAge(correctCount, partialCount > 0);
         state.save('vision', correctCount);
         saveResult('vision', age, `${correctCount}/${LEVELS.length}개`);
 

@@ -3,7 +3,7 @@ import { calculator } from './calculator.js';
 import { renderTipsCard, initTipsCard } from './tips.js';
 import { saveResult, renderHistoryInline } from './history.js';
 
-const MAX_SPAN = 9;
+const MAX_SPAN = 12;
 
 export function startMemoryTest() {
     let span = 3;
@@ -16,7 +16,7 @@ export function startMemoryTest() {
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
                 <h2 style="color: var(--primary-color); margin-top: 10px;">기억력 테스트</h2>
-                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 20살 ~ 80살</div>
+                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 15살 ~ 70살</div>
                 <p style="line-height: 1.8;">숫자가 하나씩 표시됩니다.<br>모두 나온 뒤 <strong>순서대로</strong> 입력하세요.<br><br>3자리부터 시작해 틀릴 때까지 늘어납니다.</p>
                 <button id="start-btn" class="btn" style="margin-top: 30px; width: 100%;">준비 완료</button>
             </div>
@@ -152,8 +152,8 @@ export function startMemoryTest() {
     }
 
     function showWrong(sequence, input, partial) {
-        const bonusMsg = partial
-            ? `<div style="color:#fbbf24; font-size:0.9rem; margin-bottom:16px;">1개만 틀렸어요! +5살 보너스 적용 🎉</div>`
+        const bonusMsg = partial && span > 3
+            ? `<div style="color:#fbbf24; font-size:0.9rem; margin-bottom:16px;">1개만 틀렸어요! -3살 보너스 적용 🎉</div>`
             : '';
         const html = `
             <div class="test-box">
@@ -180,7 +180,7 @@ export function startMemoryTest() {
 
     function showResult(maxSpan, partial) {
         const baseAge = calculator.getMemoryAge(maxSpan);
-        const age = partial ? Math.max(baseAge - 5, 15) : baseAge;
+        const age = partial && maxSpan >= 3 ? Math.max(baseAge - 3, 15) : baseAge;
         state.save('memory', maxSpan);
         saveResult('memory', age, `${maxSpan}자리`);
 

@@ -10,8 +10,8 @@
     --primary-lite: rgba(124, 58, 237, 0.18);
     --primary-grad: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
     --text:         #f1f5f9;
-    --text-sub:     #a8b8cc;
-    --text-muted:   #5a6a82;
+    --text-sub:     #c4d1e4;
+    --text-muted:   #a1b3c9;
     --neon-purple:  #a855f7;
     --neon-cyan:    #22d3ee;
     --neon-amber:   #fbbf24;
@@ -59,6 +59,7 @@ body {
     width: 100%;
     max-width: 520px;
     min-height: 100vh;
+    min-height: 100dvh;
     background: var(--surface);
     display: flex;
     flex-direction: column;
@@ -88,7 +89,7 @@ header {
     background: rgba(16, 20, 40, 0.97);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 15px 22px;
+    padding: calc(15px + env(safe-area-inset-top, 0px)) calc(22px + env(safe-area-inset-right, 0px)) 15px calc(22px + env(safe-area-inset-left, 0px));
     border-bottom: 1px solid rgba(124, 58, 237, 0.25);
     display: flex;
     align-items: center;
@@ -102,7 +103,7 @@ header {
 header h1 {
     margin: 0;
     font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 900;
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -113,7 +114,7 @@ header h1 {
 }
 
 header .header-tag {
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 900;
     color: #a855f7;
     background: rgba(124, 58, 237, 0.1);
@@ -132,7 +133,7 @@ header .header-tag {
 /* ── 메인 ── */
 main {
     flex: 1;
-    padding: 20px 15px 44px;
+    padding: 20px calc(15px + env(safe-area-inset-right, 0px)) calc(44px + env(safe-area-inset-bottom, 0px)) calc(15px + env(safe-area-inset-left, 0px));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -146,10 +147,10 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 /* ── 공통 버튼 ── */
 .btn {
     padding: 16px 32px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 900;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    text-transform: none;
     background: var(--primary-grad);
     color: #fff;
     border: none;
@@ -166,7 +167,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 
 .btn:active,
 .btn-home:active,
-.indicator-card.available:active,
+.indicator-card:active,
 .r-btn:active { transform: scale(0.97); }
 
 .btn:focus-visible,
@@ -276,12 +277,12 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     background: rgba(168, 85, 247, 0.12);
     border: 1px solid rgba(168, 85, 247, 0.3);
     border-radius: 999px;
-    padding: 4px 12px;
-    font-size: 10px;
+    padding: 5px 12px;
+    font-size: 12px;
     font-weight: 900;
     color: #a855f7;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-transform: none;
     margin-bottom: 12px;
 }
 
@@ -350,27 +351,67 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     50%       { transform: translateY(-9px); }
 }
 
+/* ── 프로그레스 섹션 ── */
+.progress-section {
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.section-label-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
 /* ── 섹션 레이블 ── */
 .section-label {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 900;
     color: #c4b5fd;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 15px;
-    align-self: flex-start;
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
 }
 
 .section-label::before {
     content: '';
     display: block;
-    width: 24px;
+    width: 20px;
     height: 3px;
     background: linear-gradient(90deg, #7c3aed, #6366f1);
     border-radius: 2px;
+}
+
+.progress-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: #dbe5f4;
+    letter-spacing: 1px;
+}
+
+/* ── 프로그레스 바 ── */
+.progress-steps {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.progress-segment {
+    height: 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(168, 85, 247, 0.28);
+    background: rgba(168, 85, 247, 0.1);
+    transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.progress-segment.filled {
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
+    border-color: rgba(168, 85, 247, 0.72);
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.45);
 }
 
 /* ── 카드 그리드 ── */
@@ -429,7 +470,8 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .card-red     { --cr: 248; --cg: 113; --cb: 113; --chex: #f87171; }
 .card-violet  { --cr: 192; --cg: 132; --cb: 252; --chex: #c084fc; }
 .card-blue    { --cr: 96;  --cg: 165; --cb: 250; --chex: #60a5fa; }
-.card-gray    { --cr: 100; --cg: 116; --cb: 139; --chex: #64748b; }
+.card-orange  { --cr: 251; --cg: 146; --cb: 60;  --chex: #fb923c; }
+.card-gray    { --cr: 148; --cg: 163; --cb: 184; --chex: #94a3b8; }
 
 /* 색상별 공유 규칙 */
 .indicator-card {
@@ -442,42 +484,53 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(var(--cr), var(--cg), var(--cb), 0.3);
 }
 
+.indicator-card.locked {
+    border-color: rgba(148, 163, 184, 0.32);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+.indicator-card.locked .card-label {
+    color: #cbd5e1;
+}
+
 /* ── 카드 아이콘 ── */
 .card-icon {
-    font-size: 44px;
+    font-size: 40px;
     line-height: 1;
     position: relative;
     z-index: 1;
-    filter: drop-shadow(0 0 12px rgba(var(--cr), var(--cg), var(--cb), 0.8)) drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+    color: var(--chex);
+    filter: drop-shadow(0 0 8px rgba(var(--cr), var(--cg), var(--cb), 0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.45));
 }
 
 .card-label {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 900;
-    color: rgba(255, 255, 255, 0.82);
+    color: rgba(255, 255, 255, 0.94);
     letter-spacing: 0.2px;
+    line-height: 1.35;
     position: relative;
     z-index: 1;
 }
 
 /* ── 나이 범위 뱃지 ── */
 .card-range {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    color: rgba(var(--cr), var(--cg), var(--cb), 0.7);
-    background: rgba(var(--cr), var(--cg), var(--cb), 0.08);
-    border: 1px solid rgba(var(--cr), var(--cg), var(--cb), 0.25);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    color: rgba(var(--cr), var(--cg), var(--cb), 0.65);
+    background: rgba(var(--cr), var(--cg), var(--cb), 0.06);
+    border: 1px solid rgba(var(--cr), var(--cg), var(--cb), 0.16);
     border-radius: 999px;
-    padding: 2px 7px;
-    margin-top: 4px;
+    padding: 2px 8px;
+    margin-top: 2px;
 }
 
 /* ── ACTIVE 뱃지 ── */
 .active-badge {
     position: absolute;
     top: 10px; right: 10px;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 900;
     padding: 3px 8px;
     border-radius: 999px;
@@ -490,11 +543,46 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 }
 
 .badge-soon {
-    font-size: 9px;
-    font-weight: 700;
-    color: var(--text-muted);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    color: #b8c4d7;
+    background: rgba(148, 163, 184, 0.08);
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 999px;
+    padding: 2px 9px;
+    letter-spacing: 0.5px;
+    text-transform: none;
+}
+
+/* ── 완료 배지 ── */
+.check-badge {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(var(--cr), var(--cg), var(--cb), 0.82), rgba(var(--cr), var(--cg), var(--cb), 0.62));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    color: #fff;
+    z-index: 3;
+    box-shadow: 0 0 8px rgba(var(--cr), var(--cg), var(--cb), 0.38), 0 1px 5px rgba(0, 0, 0, 0.28);
+    animation: checkPulse 0.5s ease-out;
+}
+
+@keyframes checkPulse {
+    0% { transform: scale(0) rotate(-90deg); opacity: 0; }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* 완료된 카드 스타일 */
+.indicator-card.completed {
+    opacity: 0.95;
 }
 
 /* ── 출시예정 토스트 ── */
@@ -528,14 +616,14 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     bottom: 0; left: 0; right: 0;
     padding: 6px;
     text-align: center;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 900;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
     border-radius: 0 0 19px 19px;
     backdrop-filter: blur(4px);
-    background: rgba(var(--cr), var(--cg), var(--cb), 0.18);
-    color: var(--chex);
+    background: rgba(var(--cr), var(--cg), var(--cb), 0.14);
+    color: rgba(var(--cr), var(--cg), var(--cb), 0.86);
 }
 
 /* ── 종합 통계 카드 ── */
@@ -557,12 +645,20 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     margin-bottom: 16px;
 }
 
+.summary-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
 .summary-title {
-    font-size: 0.8rem;
+    font-size: 0.92rem;
     font-weight: 900;
-    color: rgba(255,255,255,0.85);
-    letter-spacing: 2px;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 1.2px;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .summary-avg {
@@ -575,18 +671,19 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     background-clip: text;
     letter-spacing: -1px;
     filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.45));
+    white-space: nowrap;
 }
 
 .summary-reset-btn {
-    font-size: 0.68rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    color: var(--text-muted);
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-sub);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 999px;
-    padding: 4px 10px;
+    padding: 5px 11px;
     cursor: pointer;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.2px;
     transition: all 0.15s;
 }
 
@@ -601,7 +698,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 
 .summary-row {
     display: grid;
-    grid-template-columns: 22px 54px 1fr 38px;
+    grid-template-columns: 22px 62px 1fr 42px;
     align-items: center;
     gap: 8px;
 }
@@ -609,9 +706,9 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .summary-icon { font-size: 1rem; text-align: center; }
 
 .summary-label {
-    font-size: 0.78rem;
+    font-size: 0.84rem;
     font-weight: 700;
-    color: var(--text-sub);
+    color: #cbd5e1;
     white-space: nowrap;
 }
 
@@ -632,9 +729,9 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 
 .summary-age {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 900;
-    color: #c4b5fd;
+    color: #ddd6fe;
     text-align: right;
 }
 
@@ -650,12 +747,12 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     background: rgba(124, 58, 237, 0.12);
     border: 1px solid rgba(124, 58, 237, 0.3);
     color: #a78bfa;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 900;
     padding: 5px 14px;
     border-radius: 20px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-transform: none;
     margin-bottom: 16px;
     align-self: center;
 }
@@ -684,7 +781,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 }
 
 .sound-wrap .sound-icon  { font-size: 40px; margin-bottom: 8px; position: relative; z-index: 1; }
-.sound-wrap .sound-label { font-size: 10px; color: rgba(167, 139, 250, 0.75); letter-spacing: 2px; text-transform: uppercase; position: relative; z-index: 1; }
+.sound-wrap .sound-label { font-size: 11px; color: #ddd6fe; letter-spacing: 0.8px; text-transform: none; position: relative; z-index: 1; }
 
 .question-text {
     font-size: 15px;
@@ -715,8 +812,8 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     color: var(--text-sub);
 }
 
-.yes-btn { background: rgba(124, 58, 237, 0.1); color: #a78bfa; border-color: rgba(124, 58, 237, 0.3); }
-.no-btn  { background: rgba(255,255,255,0.03);  color: var(--text-muted); }
+.yes-btn { background: rgba(124, 58, 237, 0.18); color: #c4b5fd; border-color: rgba(124, 58, 237, 0.45); }
+.no-btn  { background: rgba(255,255,255,0.06);  color: #94a3b8; }
 
 .answer-btn:active  { transform: scale(0.98); }
 .yes-btn:hover      { background: rgba(124, 58, 237, 0.2); }
@@ -763,8 +860,8 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 }
 
 .result-hero .result-sub {
-    font-size: 9px;
-    color: rgba(167, 139, 250, 0.7);
+    font-size: 11px;
+    color: rgba(196, 181, 253, 0.95);
     letter-spacing: 2.5px;
     margin-bottom: 8px;
     text-transform: uppercase;
@@ -794,8 +891,8 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 }
 
 .result-hz {
-    font-size: 11px;
-    color: rgba(167, 139, 250, 0.55);
+    font-size: 12px;
+    color: rgba(196, 181, 253, 0.9);
     margin-top: 8px;
     letter-spacing: 1.5px;
     position: relative;
@@ -815,7 +912,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .rc-label {
     display: flex;
     justify-content: space-between;
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     letter-spacing: 1.5px;
     text-transform: uppercase;
@@ -837,7 +934,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     flex: 1;
     border-radius: 12px;
     padding: 14px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 900;
     border: none;
     cursor: pointer;
@@ -962,7 +1059,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .vision-progress {
     font-size: 0.82rem;
     font-weight: 900;
-    color: #6366f1;
+    color: #818cf8;
     letter-spacing: 2.5px;
     text-transform: uppercase;
 }
@@ -991,7 +1088,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .stroop-progress {
     font-size: 0.82rem;
     font-weight: 900;
-    color: #6366f1;
+    color: #818cf8;
     letter-spacing: 2.5px;
     text-transform: uppercase;
 }
@@ -1123,7 +1220,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .reaction-box .btn-home { position: absolute; top: 16px; left: 16px; margin-bottom: 0; }
 
 .round-label {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 900;
     color: #6366f1;
     letter-spacing: 2.5px;
@@ -1196,7 +1293,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     content: '▸';
     position: absolute;
     left: 0;
-    color: #7c3aed;
+    color: #a78bfa;
     font-size: 0.72rem;
     top: 2px;
 }
@@ -1219,10 +1316,10 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 
 .hist-better { background: rgba(52,211,153,0.1);  color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
 .hist-worse  { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
-.hist-same   { background: rgba(148,163,184,0.07); color: var(--text-sub); border: 1px solid rgba(148,163,184,0.15); }
+.hist-same   { background: rgba(148,163,184,0.12); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.4); }
 
 .hist-arrow { font-size: 1.1rem; line-height: 1; }
-.hist-raw   { font-size: 0.75rem; opacity: 0.6; margin-left: 2px; }
+.hist-raw   { font-size: 0.75rem; opacity: 0.85; margin-left: 2px; }
 
 /* ══════════════════════════════════════════
    ── 기록 화면 ──
@@ -1267,6 +1364,29 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     padding: 2px 8px;
     border-radius: 999px;
     letter-spacing: 0.5px;
+}
+
+.history-section-clear-btn {
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    background: rgba(248, 113, 113, 0.08);
+    color: #fca5a5;
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: all 0.15s ease;
+}
+
+.history-section-clear-btn:hover {
+    background: rgba(248, 113, 113, 0.16);
+    border-color: rgba(248, 113, 113, 0.55);
+    color: #fecaca;
+}
+
+.history-section-clear-btn:active {
+    transform: scale(0.97);
 }
 
 /* ── 기록 그래프 ── */
@@ -1329,26 +1449,26 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 
 .hg-label-latest {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     fill: #e879f9;
 }
 
 .hg-ylabel {
-    font-size: 9px;
-    fill: rgba(148,163,184,0.6);
+    font-size: 10px;
+    fill: rgba(148,163,184,0.95);
     text-anchor: end;
 }
 
 .hg-date {
-    font-size: 9px;
-    fill: rgba(148,163,184,0.5);
+    font-size: 10px;
+    fill: rgba(148,163,184,0.9);
     text-anchor: middle;
 }
 
 .hg-single {
     font-size: 0.75rem;
-    color: var(--text-muted);
+    color: #94a3b8;
     text-align: center;
     padding: 12px 0 4px;
 }
@@ -1382,22 +1502,22 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .history-fab {
     width: 100%;
     padding: 14px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(100, 116, 139, 0.28);
+    border: 1px solid rgba(148, 163, 184, 0.45);
     border-radius: 12px;
-    color: #c4b5fd;
+    color: #e2e8f0;
     font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
     letter-spacing: 0.5px;
     transition: all 0.15s;
     margin-bottom: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
 }
 
 .history-fab:hover {
-    background: rgba(124,58,237,0.15);
-    border-color: rgba(124,58,237,0.5);
+    background: rgba(124,58,237,0.3);
+    border-color: rgba(168,85,247,0.7);
     color: #fff;
     box-shadow: 0 6px 24px rgba(124,58,237,0.3);
 }
@@ -1406,24 +1526,24 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .share-fab {
     width: 100%;
     padding: 14px;
-    background: rgba(124, 58, 237, 0.12);
-    border: 1px solid rgba(124, 58, 237, 0.35);
+    background: rgba(124, 58, 237, 0.32);
+    border: 1px solid rgba(168, 85, 247, 0.65);
     border-radius: 12px;
-    color: #c4b5fd;
+    color: #fff;
     font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
     letter-spacing: 0.5px;
     transition: all 0.15s;
     margin-bottom: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 16px rgba(124,58,237,0.25);
 }
 
 .share-fab:hover {
-    background: rgba(124, 58, 237, 0.25);
-    border-color: rgba(124, 58, 237, 0.7);
+    background: rgba(124, 58, 237, 0.5);
+    border-color: rgba(168, 85, 247, 0.9);
     color: #fff;
-    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.35);
+    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.45);
 }
 
 .share-fab--copied {
@@ -1432,33 +1552,154 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     color: #34d399;
 }
 
+.history-fab:active,
+.share-fab:active,
+.final-fab:active,
+.save-img-btn:active,
+.share-result-btn:active,
+.history-clear-btn:active,
+.tips-toggle:active {
+    transform: scale(0.97);
+}
+
 /* ── 앱 푸터 ── */
 .app-footer {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 24px 0 8px;
+    padding: 24px 0 calc(8px + env(safe-area-inset-bottom, 0px));
     font-size: 12px;
 }
 
 .footer-link {
-    color: #475569;
+    color: #94a3b8;
     text-decoration: none;
     transition: color 0.15s;
 }
 
 .footer-link:hover {
-    color: #7c3aed;
+    color: #c4b5fd;
 }
 
 .footer-sep {
-    color: #1e293b;
+    color: #64748b;
 }
 
 .footer-copy {
-    color: #334155;
+    color: #94a3b8;
 }
+
+/* ── 균형감각 테스트 화면 유틸 ── */
+.mobile-only-box.with-top-gap { margin-top: 20px; }
+
+.test-title-accent {
+    color: var(--primary-color);
+    margin-top: 10px;
+}
+
+.test-range-pill {
+    display: inline-block;
+    background: rgba(108, 99, 255, 0.1);
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+}
+
+.test-copy-relaxed { line-height: 1.8; }
+
+.test-note-card {
+    background: rgba(108, 99, 255, 0.07);
+    border-radius: 14px;
+    padding: 14px 16px;
+    width: 100%;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #b8c4d7;
+    line-height: 1.6;
+}
+
+.btn-start-wide {
+    margin-top: 24px;
+    width: 100%;
+}
+
+.test-center-icon {
+    font-size: 3rem;
+    margin: 20px auto;
+    text-align: center;
+    width: 100%;
+}
+
+.test-error-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #f87171;
+    text-align: center;
+    width: 100%;
+}
+
+.test-error-desc {
+    color: #b8c4d7;
+    text-align: center;
+    width: 100%;
+    line-height: 1.6;
+}
+
+.test-action-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.test-action-row--compact {
+    gap: 15px;
+    margin-top: 12px;
+}
+
+.btn-ghost-light {
+    flex: 1;
+    background: #475569;
+}
+
+.btn-warn {
+    flex: 1;
+    background: #fbbf24;
+    color: #1e293b;
+}
+
+.btn-flex { flex: 1; }
+
+.btn-home-overlay {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    margin-bottom: 0;
+}
+
+.countdown-hint,
+.balance-live-hint {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.countdown-hint { font-size: 0.95rem; }
+.balance-live-hint { font-size: 0.9rem; }
+
+.result-title {
+    font-size: 1.8rem;
+    margin-top: 10px;
+}
+
+.result-sub-note {
+    color: #b8c4d7;
+    margin: 5px 0 12px;
+}
+
+.result-sub-note strong { color: var(--text-color); }
 
 /* ── 페이지 전환 애니메이션 ── */
 @keyframes pageEnter {
@@ -1471,21 +1712,22 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .save-img-btn {
     width: 100%;
     padding: 14px;
-    background: rgba(34, 211, 153, 0.1);
-    border: 1px solid rgba(34, 211, 153, 0.35);
+    background: rgba(34, 211, 153, 0.22);
+    border: 1px solid rgba(52, 211, 153, 0.6);
     border-radius: 12px;
-    color: #34d399;
+    color: #fff;
     font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
     letter-spacing: 0.5px;
     transition: all 0.15s;
     margin-bottom: 10px;
+    box-shadow: 0 4px 16px rgba(34,211,153,0.15);
 }
 .save-img-btn:hover {
-    background: rgba(34, 211, 153, 0.18);
-    border-color: rgba(34, 211, 153, 0.6);
-    box-shadow: 0 4px 20px rgba(34, 211, 153, 0.2);
+    background: rgba(34, 211, 153, 0.35);
+    border-color: rgba(52, 211, 153, 0.85);
+    box-shadow: 0 4px 20px rgba(34, 211, 153, 0.3);
 }
 .save-img-btn:disabled {
     opacity: 0.5;
@@ -1517,21 +1759,21 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 .final-fab {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(168,85,247,0.2) 100%);
-    border: 1px solid rgba(168, 85, 247, 0.5);
+    background: linear-gradient(135deg, rgba(124,58,237,0.45) 0%, rgba(168,85,247,0.4) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.75);
     border-radius: 14px;
-    color: #e9d5ff;
+    color: #fff;
     font-size: 1rem;
     font-weight: 900;
     cursor: pointer;
     letter-spacing: 1px;
     transition: all 0.15s;
     margin-bottom: 12px;
-    box-shadow: 0 4px 20px rgba(124,58,237,0.25);
+    box-shadow: 0 4px 20px rgba(124,58,237,0.35);
 }
 .final-fab:hover {
-    background: linear-gradient(135deg, rgba(124,58,237,0.35) 0%, rgba(168,85,247,0.35) 100%);
-    box-shadow: 0 6px 28px rgba(124,58,237,0.4);
+    background: linear-gradient(135deg, rgba(124,58,237,0.65) 0%, rgba(168,85,247,0.6) 100%);
+    box-shadow: 0 6px 28px rgba(124,58,237,0.5);
     transform: translateY(-1px);
 }
 
@@ -1541,7 +1783,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0;
+    gap: 10px;
 }
 
 .final-header {
@@ -1549,9 +1791,9 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     background: linear-gradient(145deg, #06030e 0%, #0d083a 40%, #130e56 100%);
     border: 1px solid rgba(124,58,237,0.3);
     border-radius: 22px;
-    padding: 32px 24px 28px;
+    padding: 30px 24px 24px;
     text-align: center;
-    margin-bottom: 14px;
+    margin-bottom: 0;
     position: relative;
     overflow: hidden;
 }
@@ -1575,48 +1817,62 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     text-shadow: 0 0 30px currentColor;
 }
 .final-avg-label {
-    font-size: 13px;
-    color: #64748b;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    font-size: 14px;
+    color: #dbe5f4;
+    letter-spacing: 0.5px;
+    text-transform: none;
     margin-bottom: 4px;
 }
 .final-avg {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 48px;
     font-weight: 900;
-    color: #f1f5f9;
+    color: #f8fbff;
     line-height: 1;
     margin-bottom: 10px;
 }
 .final-msg {
     font-size: 15px;
-    color: #94a3b8;
+    color: #e2e8f0;
+    line-height: 1.6;
 }
 
 .final-rows {
     width: 100%;
-    background: rgba(10,14,36,0.92);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(10,14,36,0.94);
+    border: 1px solid rgba(148, 163, 184, 0.12);
     border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 12px;
+    padding: 18px 16px;
+    margin-bottom: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 .final-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 20px 78px 1fr 42px;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-size: 13px;
 }
-.final-icon { font-size: 16px; flex-shrink: 0; }
-.final-label { color: #94a3b8; width: 64px; flex-shrink: 0; font-size: 12px; }
+.final-row-pending {
+    opacity: 0.5;
+}
+.final-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    text-align: center;
+}
+.final-label {
+    color: #f1f5f9;
+    width: auto;
+    flex-shrink: 0;
+    font-size: 13px;
+}
 .final-bar-bg {
     flex: 1;
-    height: 6px;
-    background: rgba(255,255,255,0.07);
+    height: 8px;
+    background: rgba(255,255,255,0.1);
     border-radius: 99px;
     overflow: hidden;
 }
@@ -1626,7 +1882,47 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     border-radius: 99px;
     transition: width 0.6s ease-out;
 }
-.final-age { color: #e2e8f0; font-weight: 700; width: 32px; text-align: right; flex-shrink: 0; }
+.final-age {
+    color: #f1f5f9;
+    font-weight: 800;
+    width: auto;
+    min-width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.final-age-pending {
+    font-size: 12px;
+    color: #94a3b8;
+}
+.final-note {
+    width: 100%;
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(148, 163, 184, 0.08);
+    color: #cbd5e1;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.6;
+}
+.final-actions,
+.final-sub-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.final-share-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+.final-home-btn {
+    width: 100%;
+    margin-top: 0 !important;
+    background: #1e293b;
+}
 
 /* ── 모바일 전용 안내 ── */
 .mobile-only-box {
@@ -1643,10 +1939,28 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 }
 .mobile-only-icon { font-size: 56px; }
 .mobile-only-title { font-size: 1.2rem; font-weight: 900; color: #f1f5f9; }
-.mobile-only-desc { font-size: 0.9rem; color: #64748b; line-height: 1.7; }
+.mobile-only-desc { font-size: 0.9rem; color: #94a3b8; line-height: 1.7; }
 
 /* ── 모바일 반응형 개선 ── */
 @media (max-width: 480px) {
+    .summary-header {
+        gap: 8px;
+    }
+
+    .summary-title {
+        font-size: 0.82rem;
+        letter-spacing: 0.8px;
+    }
+
+    .summary-avg {
+        font-size: 1.6rem;
+    }
+
+    .summary-reset-btn {
+        font-size: 0.72rem;
+        padding: 4px 9px;
+    }
+
     .section-label {
         font-size: 14px;
         margin-bottom: 12px;
@@ -1662,11 +1976,11 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     }
 
     .card-label {
-        font-size: 11px;
+        font-size: 12px;
     }
 
     .hero-main {
-        font-size: 18px;
+        font-size: 19px;
     }
 
     .hero-pulse { width: 56px; height: 56px; }
@@ -1675,6 +1989,19 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     .history-fab {
         font-size: 0.85rem;
         padding: 12px;
+    }
+
+    .final-header {
+        padding: 26px 18px 22px;
+    }
+
+    .final-row {
+        grid-template-columns: 18px 70px 1fr 38px;
+        gap: 8px;
+    }
+
+    .final-share-row {
+        grid-template-columns: 1fr;
     }
 }
 
