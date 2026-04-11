@@ -250,9 +250,23 @@ function roundRect(ctx, x, y, w, h, r) {
     ctx.closePath();
 }
 
-function drawResultCard(done, avgAge, grade) {
+function svgToImage(svgStr, size, color) {
+    const colored = svgStr
+        .replace(/width="1em"/g, `width="${size}"`)
+        .replace(/height="1em"/g, `height="${size}"`)
+        .replace(/currentColor/g, color);
+    const dataUrl = 'data:image/svg+xml,' + encodeURIComponent(colored);
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = dataUrl;
+    });
+}
+
+async function drawResultCard(done, avgAge, grade) {
     const W = 400;
-    const H = 362 + done.length * 40;
+    const H = 330 + done.length * 40;
     const DPR = 2;
     const canvas = document.createElement('canvas');
     canvas.width  = W * DPR;
@@ -262,14 +276,14 @@ function drawResultCard(done, avgAge, grade) {
 
     // 배경 그라디언트
     const bg = ctx.createLinearGradient(0, 0, W, H);
-    bg.addColorStop(0, '#06030e');
-    bg.addColorStop(0.45, '#0d083a');
-    bg.addColorStop(1, '#04060f');
+    bg.addColorStop(0, '#0f0a1e');
+    bg.addColorStop(0.45, '#16104a');
+    bg.addColorStop(1, '#0a0d1f');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
 
     // 그리드 패턴
-    ctx.strokeStyle = 'rgba(124,58,237,0.07)';
+    ctx.strokeStyle = 'rgba(124,58,237,0.12)';
     ctx.lineWidth = 1;
     for (let x = 0; x < W; x += 26) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
     for (let yy = 0; yy < H; yy += 26) { ctx.beginPath(); ctx.moveTo(0,yy); ctx.lineTo(W,yy); ctx.stroke(); }
@@ -289,7 +303,7 @@ function drawResultCard(done, avgAge, grade) {
     y += 42;
 
     // 앱 이름
-    ctx.fillStyle = '#94a3b8';
+    ctx.fillStyle = '#cbd5e1';
     ctx.font = '400 13px "Noto Sans KR", sans-serif';
     ctx.fillText('신체 나이 측정기 · KGS Lab', pad, y);
     y += 34;
@@ -299,7 +313,7 @@ function drawResultCard(done, avgAge, grade) {
     y += 18;
 
     // 종합 나이 라벨
-    ctx.fillStyle = '#94a3b8';
+    ctx.fillStyle = '#cbd5e1';
     ctx.font = '700 12px "Noto Sans KR", sans-serif';
     ctx.fillText(`종합 신체 나이 (${done.length}/${indicators.filter(i => i.available).length})`, W / 2, y);
     y += 20;
@@ -313,7 +327,7 @@ function drawResultCard(done, avgAge, grade) {
     y += 8;
 
     // 구분선
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
     y += 18;
@@ -322,16 +336,22 @@ function drawResultCard(done, avgAge, grade) {
     ctx.textAlign = 'left';
     const barX = pad + 92;
     const barW = W - barX - pad - 36;
+    const ICON_SIZE = 18;
 
-    for (const e of done) {
+    // 아이콘 이미지 미리 로드
+    const iconImgs = await Promise.all(done.map(e => svgToImage(e.icon, ICON_SIZE, '#e2e8f0')));
+
+    for (let i = 0; i < done.length; i++) {
+        const e = done[i];
         // 아이콘
-        ctx.font = '15px sans-serif';
-        ctx.fillText(e.emoji ?? e.icon, pad, y + 11);
+        if (iconImgs[i]) {
+            ctx.drawImage(iconImgs[i], pad, y, ICON_SIZE, ICON_SIZE);
+        }
 
         // 라벨
-        ctx.fillStyle = '#94a3b8';
+        ctx.fillStyle = '#e2e8f0';
         ctx.font = '400 11px "Noto Sans KR", sans-serif';
-        ctx.fillText(e.label, pad + 22, y + 12);
+        ctx.fillText(e.label, pad + ICON_SIZE + 6, y + 13);
 
         // 바 배경
         ctx.fillStyle = 'rgba(255,255,255,0.07)';
@@ -357,23 +377,12 @@ function drawResultCard(done, avgAge, grade) {
 
     y += 6;
 
-    // 하단 구분선
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
-    y += 14;
-
-    // URL
-    ctx.fillStyle = '#334155';
-    ctx.font = '400 11px "Space Grotesk", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(APP_URL.replace('https://', '').replace(/\/$/, ''), W / 2, y);
-
     return canvas;
 }
 
 async function buildResultImageFile(done, avgAge, grade) {
     await document.fonts.ready;
-    const canvas = drawResultCard(done, avgAge, grade);
+    const canvas = await drawResultCard(done, avgAge, grade);
     return new Promise(resolve => {
         canvas.toBlob(blob => {
             resolve(new File([blob], 'body-age-result.png', { type: 'image/png' }));
