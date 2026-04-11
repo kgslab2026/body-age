@@ -25,6 +25,8 @@ const ICONS = {
     number:  `<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><rect x="12" y="12" width="20" height="20" rx="3" stroke="currentColor" stroke-width="2"/><rect x="17" y="17" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5" opacity=".5"/><line x1="17" y1="12" x2="17" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="22" y1="12" x2="22" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="27" y1="12" x2="27" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="17" y1="32" x2="17" y2="38" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="22" y1="32" x2="22" y2="38" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="27" y1="32" x2="27" y2="38" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="17" x2="6" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="22" x2="6" y2="22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="27" x2="6" y2="27" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="32" y1="17" x2="38" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="32" y1="22" x2="38" y2="22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="32" y1="27" x2="38" y2="27" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
 };
 
+
+
 const app = document.getElementById('app');
 
 const STATE_KEY = 'bodyage_state';
@@ -135,7 +137,7 @@ function showFinalResult() {
     for (const i of indicators) {
         if (!i.available) continue;
         if (hasResult(i.id)) {
-            done.push({ icon: i.icon, emoji: i.emoji, label: i.label.replace(' 나이', ''), age: getResultAge(i.id) });
+            done.push({ id: i.id, icon: i.icon, label: i.label.replace(' 나이', ''), age: getResultAge(i.id) });
         } else {
             pending.push({ icon: i.icon, label: i.label.replace(' 나이', '') });
         }
@@ -150,8 +152,7 @@ function showFinalResult() {
                 <div class="empty-result-title">아직 측정 결과가 없어요</div>
                 <p class="empty-result-copy">테스트를 하나 이상 완료하면<br>종합 결과를 볼 수 있어요!</p>
                 <button id="btn-home2" class="btn empty-result-cta">테스트 시작하기</button>
-                <button id="btn-save-empty" class="save-img-btn" style="margin-top:16px">📸 이미지로 저장</button>
-                <div class="final-share-row" style="margin-top:8px">
+                <div class="final-share-row" style="margin-top:16px">
                     <button id="btn-share-empty" class="share-fab">📤 결과 공유하기</button>
                     <button id="btn-recommend-empty" class="share-fab">🔗 친구에게 추천하기</button>
                 </div>
@@ -163,7 +164,6 @@ function showFinalResult() {
         navigate(html, () => {
             document.getElementById('btn-home').onclick = showMain;
             document.getElementById('btn-home2').onclick = showMain;
-            document.getElementById('btn-save-empty').addEventListener('click', () => showToast('📋 검사 결과가 없습니다'));
             document.getElementById('btn-share-empty').addEventListener('click', () => showToast('📋 검사 결과가 없습니다'));
             document.getElementById('btn-recommend-empty').addEventListener('click', shareApp);
             document.getElementById('btn-history-empty').addEventListener('click', showHistoryView);
@@ -173,12 +173,6 @@ function showFinalResult() {
 
     const avgAge = Math.round(done.reduce((s, e) => s + e.age, 0) / done.length);
 
-    const grade =
-        avgAge <= 22 ? { msg: '전설적인 신체 능력이에요!', color: '#fbbf24' } :
-        avgAge <= 32 ? { msg: '매우 젊고 건강한 신체예요!', color: '#34d399' } :
-        avgAge <= 42 ? { msg: '평균보다 젊은 신체예요',     color: '#60a5fa' } :
-        avgAge <= 55 ? { msg: '나이에 맞는 건강한 신체예요', color: '#a78bfa' } :
-                       { msg: '꾸준한 관리를 시작해보세요', color: '#fb923c' };
 
     const doneRows = done.map(e => {
         const pct = Math.max(5, Math.round((e.age / 80) * 100));
@@ -213,7 +207,6 @@ function showFinalResult() {
             <div class="final-rows">${doneRows}${pendingRows}</div>
             ${pendingNote}
             <div class="final-actions">
-                <button id="final-save" class="save-img-btn">📸 이미지로 저장</button>
                 <div class="final-share-row">
                     <button id="final-share" class="share-fab">📤 결과 공유하기</button>
                     <button id="final-recommend" class="share-fab">🔗 친구에게 추천하기</button>
@@ -229,8 +222,7 @@ function showFinalResult() {
     navigate(html, () => {
         document.getElementById('final-home').onclick = showMain;
         document.getElementById('final-history').onclick = showHistoryView;
-        document.getElementById('final-save').addEventListener('click', () => saveResultImage(done, avgAge, grade));
-        document.getElementById('final-share').addEventListener('click', () => shareResultImage(done, avgAge, grade));
+        document.getElementById('final-share').addEventListener('click', () => shareResultImage(done, avgAge));
         document.getElementById('final-recommend').addEventListener('click', shareApp);
     });
 }
@@ -250,23 +242,61 @@ function roundRect(ctx, x, y, w, h, r) {
     ctx.closePath();
 }
 
-function svgToImage(svgStr, size, color) {
-    const colored = svgStr
-        .replace(/width="1em"/g, `width="${size}"`)
-        .replace(/height="1em"/g, `height="${size}"`)
-        .replace(/currentColor/g, color);
-    const dataUrl = 'data:image/svg+xml,' + encodeURIComponent(colored);
-    return new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = dataUrl;
-    });
+function drawSvgIcon(ctx, svgStr, x, y, size, color) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgStr, 'image/svg+xml');
+    const scale = size / 44;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    for (const el of doc.querySelectorAll('path, circle, line, rect')) {
+        const tag = el.tagName;
+        const stroke = el.getAttribute('stroke');
+        const fill = el.getAttribute('fill');
+        const sw = parseFloat(el.getAttribute('stroke-width') || '1');
+        const op = parseFloat(el.getAttribute('opacity') || '1');
+
+        ctx.save();
+        ctx.globalAlpha = op;
+        ctx.lineWidth = sw;
+        ctx.lineCap = el.getAttribute('stroke-linecap') || 'butt';
+        ctx.lineJoin = el.getAttribute('stroke-linejoin') || 'miter';
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+
+        if (tag === 'path') {
+            const p = new Path2D(el.getAttribute('d'));
+            if (fill && fill !== 'none') ctx.fill(p);
+            if (stroke && stroke !== 'none') ctx.stroke(p);
+        } else if (tag === 'circle') {
+            ctx.beginPath();
+            ctx.arc(+el.getAttribute('cx'), +el.getAttribute('cy'), +el.getAttribute('r'), 0, Math.PI * 2);
+            if (fill && fill !== 'none') ctx.fill();
+            if (stroke && stroke !== 'none') ctx.stroke();
+        } else if (tag === 'line') {
+            ctx.beginPath();
+            ctx.moveTo(+el.getAttribute('x1'), +el.getAttribute('y1'));
+            ctx.lineTo(+el.getAttribute('x2'), +el.getAttribute('y2'));
+            if (stroke && stroke !== 'none') ctx.stroke();
+        } else if (tag === 'rect') {
+            const rx = +(el.getAttribute('x') || 0), ry = +(el.getAttribute('y') || 0);
+            const rw = +el.getAttribute('width'),   rh = +el.getAttribute('height');
+            const r  = +(el.getAttribute('rx') || 0);
+            if (r > 0) { roundRect(ctx, rx, ry, rw, rh, r); } else { ctx.beginPath(); ctx.rect(rx, ry, rw, rh); }
+            if (fill && fill !== 'none') ctx.fill();
+            if (stroke && stroke !== 'none') ctx.stroke();
+        }
+        ctx.restore();
+    }
+    ctx.restore();
 }
 
-async function drawResultCard(done, avgAge, grade) {
+function drawResultCard(done, avgAge) {
     const W = 400;
-    const H = 330 + done.length * 40;
+    const ROW_H = 50;
+    const H = 380 + done.length * ROW_H;
     const DPR = 2;
     const canvas = document.createElement('canvas');
     canvas.width  = W * DPR;
@@ -274,115 +304,173 @@ async function drawResultCard(done, avgAge, grade) {
     const ctx = canvas.getContext('2d');
     ctx.scale(DPR, DPR);
 
-    // 배경 그라디언트
-    const bg = ctx.createLinearGradient(0, 0, W, H);
-    bg.addColorStop(0, '#0f0a1e');
-    bg.addColorStop(0.45, '#16104a');
-    bg.addColorStop(1, '#0a0d1f');
-    ctx.fillStyle = bg;
+    // ── 배경 ──
+    ctx.fillStyle = '#07040f';
     ctx.fillRect(0, 0, W, H);
 
-    // 그리드 패턴
-    ctx.strokeStyle = 'rgba(124,58,237,0.12)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < W; x += 26) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-    for (let yy = 0; yy < H; yy += 26) { ctx.beginPath(); ctx.moveTo(0,yy); ctx.lineTo(W,yy); ctx.stroke(); }
+    // 방사형 글로우 (좌상단)
+    const g1 = ctx.createRadialGradient(W * 0.15, H * 0.15, 0, W * 0.15, H * 0.15, W * 0.65);
+    g1.addColorStop(0, 'rgba(109,40,217,0.35)');
+    g1.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g1; ctx.fillRect(0, 0, W, H);
 
-    const pad = 32;
-    let y = pad;
+    // 방사형 글로우 (우하단)
+    const g2 = ctx.createRadialGradient(W * 0.9, H * 0.85, 0, W * 0.9, H * 0.85, W * 0.5);
+    g2.addColorStop(0, 'rgba(79,20,180,0.2)');
+    g2.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H);
 
-    // 앱 뱃지
-    ctx.fillStyle = 'rgba(124,58,237,0.2)';
-    ctx.strokeStyle = 'rgba(124,58,237,0.5)';
-    ctx.lineWidth = 1;
-    roundRect(ctx, pad, y, 126, 26, 13); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#c4b5fd';
-    ctx.font = '700 11px "Space Grotesk", sans-serif';
+    // 미세 그리드
+    ctx.strokeStyle = 'rgba(124,58,237,0.07)';
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x < W; x += 24) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let yy = 0; yy < H; yy += 24) { ctx.beginPath(); ctx.moveTo(0,yy); ctx.lineTo(W,yy); ctx.stroke(); }
+
+    // 상단 퍼플 라인
+    const topLine = ctx.createLinearGradient(0, 0, W, 0);
+    topLine.addColorStop(0,   'rgba(124,58,237,0)');
+    topLine.addColorStop(0.5, 'rgba(168,85,247,1)');
+    topLine.addColorStop(1,   'rgba(124,58,237,0)');
+    ctx.fillStyle = topLine;
+    ctx.fillRect(0, 0, W, 2);
+
+    const pad = 28;
+    let y = pad + 6;
+
+    // ── 앱 타이틀 ──
     ctx.textAlign = 'left';
-    ctx.fillText('BODY AGE TEST', pad + 12, y + 17);
-    y += 42;
 
-    // 앱 이름
-    ctx.fillStyle = '#cbd5e1';
-    ctx.font = '400 13px "Noto Sans KR", sans-serif';
-    ctx.fillText('신체 나이 측정기 · KGS Lab', pad, y);
-    y += 34;
+    // "BODY AGE" — 굵고 밝게
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 22px "Space Grotesk", sans-serif';
+    ctx.fillText('BODY AGE', pad, y + 22);
 
-    // 헤더 간격
+    // 구분 점
+    const baWidth = ctx.measureText('BODY AGE').width;
+    ctx.fillStyle = 'rgba(168,85,247,0.9)';
+    ctx.font = '700 22px "Space Grotesk", sans-serif';
+    ctx.fillText(' —', pad + baWidth, y + 22);
+
+    const dashWidth = ctx.measureText(' —').width;
+
+    // "신체 나이 측정기" — 가늘고 연하게
+    ctx.fillStyle = 'rgba(196,181,253,0.75)';
+    ctx.font = '400 14px "Noto Sans KR", sans-serif';
+    ctx.fillText(' 신체 나이 측정기', pad + baWidth + dashWidth, y + 21);
+
+    y += 52;
+
+    // ── 나이 카드 ──
+    const cardH = 130;
+    const cardX = pad;
+    const cardW = W - pad * 2;
+
+    // 카드 배경
+    ctx.fillStyle = 'rgba(124,58,237,0.1)';
+    roundRect(ctx, cardX, y, cardW, cardH, 16); ctx.fill();
+
+    // 카드 테두리 (그라디언트)
+    const borderGrad = ctx.createLinearGradient(cardX, y, cardX + cardW, y + cardH);
+    borderGrad.addColorStop(0,   'rgba(168,85,247,0.8)');
+    borderGrad.addColorStop(0.5, 'rgba(124,58,237,0.4)');
+    borderGrad.addColorStop(1,   'rgba(168,85,247,0.8)');
+    ctx.strokeStyle = borderGrad;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, cardX, y, cardW, cardH, 16); ctx.stroke();
+
     ctx.textAlign = 'center';
-    y += 18;
 
-    // 종합 나이 라벨
-    ctx.fillStyle = '#cbd5e1';
-    ctx.font = '700 12px "Noto Sans KR", sans-serif';
-    ctx.fillText(`종합 신체 나이 (${done.length}/${indicators.filter(i => i.available).length})`, W / 2, y);
-    y += 20;
+    // "내 신체 나이" 라벨
+    ctx.fillStyle = 'rgba(196,181,253,0.8)';
+    ctx.font = '500 14px "Noto Sans KR", sans-serif';
+    ctx.fillText('내 신체 나이', W / 2, y + 32);
 
-    // 평균 나이
-    ctx.fillStyle = '#f1f5f9';
-    ctx.font = '900 42px "Space Grotesk", sans-serif';
-    ctx.fillText(`${avgAge}살`, W / 2, y + 34);
-    y += 48;
+    // 숫자 글로우
+    ctx.shadowColor = 'rgba(168,85,247,0.65)';
+    ctx.shadowBlur = 30;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 64px "Space Grotesk", sans-serif';
+    ctx.fillText(`${avgAge}살`, W / 2, y + 105);
+    ctx.shadowBlur = 0;
+    y += cardH + 20;
 
-    y += 8;
-
-    // 구분선
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    // 그라디언트 구분선
+    const divGrad = ctx.createLinearGradient(pad, 0, W - pad, 0);
+    divGrad.addColorStop(0,   'rgba(124,58,237,0)');
+    divGrad.addColorStop(0.5, 'rgba(124,58,237,0.5)');
+    divGrad.addColorStop(1,   'rgba(124,58,237,0)');
+    ctx.strokeStyle = divGrad;
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
-    y += 18;
+    y += 20;
 
-    // 결과 행
-    ctx.textAlign = 'left';
-    const barX = pad + 92;
-    const barW = W - barX - pad - 36;
+    // ── 결과 행 ──
+    const ACCENT = {
+        hearing:   '#22d3ee', neural: '#fbbf24', balance:   '#34d399',
+        attention: '#f87171', vision: '#a78bfa', brain:     '#60a5fa', number: '#fb923c',
+    };
     const ICON_SIZE = 18;
+    const labelX = pad + 14 + ICON_SIZE + 6;
+    const barX   = labelX + 68;
+    const barW   = W - barX - pad - 40;
 
-    // 아이콘 이미지 미리 로드
-    const iconImgs = await Promise.all(done.map(e => svgToImage(e.icon, ICON_SIZE, '#e2e8f0')));
+    ctx.textAlign = 'left';
+    for (const e of done) {
+        const accent = ACCENT[e.id] || '#a78bfa';
 
-    for (let i = 0; i < done.length; i++) {
-        const e = done[i];
+        // 행 배경
+        ctx.fillStyle = 'rgba(255,255,255,0.03)';
+        roundRect(ctx, pad, y, W - pad * 2, ROW_H - 6, 8); ctx.fill();
+
+        // 왼쪽 컬러 액센트 바
+        ctx.fillStyle = accent;
+        roundRect(ctx, pad, y, 3, ROW_H - 6, 2); ctx.fill();
+
         // 아이콘
-        if (iconImgs[i]) {
-            ctx.drawImage(iconImgs[i], pad, y, ICON_SIZE, ICON_SIZE);
-        }
+        drawSvgIcon(ctx, e.icon, pad + 12, y + (ROW_H - 6 - ICON_SIZE) / 2, ICON_SIZE, accent);
 
         // 라벨
-        ctx.fillStyle = '#e2e8f0';
+        ctx.fillStyle = '#cbd5e1';
         ctx.font = '400 11px "Noto Sans KR", sans-serif';
-        ctx.fillText(e.label, pad + ICON_SIZE + 6, y + 13);
+        ctx.fillText(e.label, labelX, y + 20);
 
         // 바 배경
-        ctx.fillStyle = 'rgba(255,255,255,0.07)';
-        roundRect(ctx, barX, y + 4, barW, 7, 4); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        roundRect(ctx, barX, y + 19, barW, 5, 3); ctx.fill();
 
-        // 바 채우기
+        // 바 채우기 (지표색 그라디언트)
         const pct = Math.max(0.05, e.age / 80);
-        const barGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
-        barGrad.addColorStop(0, '#7c3aed');
-        barGrad.addColorStop(1, '#a855f7');
-        ctx.fillStyle = barGrad;
-        roundRect(ctx, barX, y + 4, barW * pct, 7, 4); ctx.fill();
+        const bGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+        bGrad.addColorStop(0, accent + '88');
+        bGrad.addColorStop(1, accent);
+        ctx.fillStyle = bGrad;
+        roundRect(ctx, barX, y + 19, barW * pct, 5, 3); ctx.fill();
 
-        // 나이
-        ctx.fillStyle = '#e2e8f0';
-        ctx.font = '700 12px "Space Grotesk", sans-serif';
+        // 나이 값
+        ctx.fillStyle = accent;
+        ctx.font = '700 13px "Space Grotesk", sans-serif';
         ctx.textAlign = 'right';
-        ctx.fillText(`${e.age}살`, W - pad, y + 12);
+        ctx.fillText(`${e.age}살`, W - pad, y + 22);
         ctx.textAlign = 'left';
 
-        y += 40;
+        y += ROW_H;
     }
 
-    y += 6;
+    y += 10;
+
+    // 하단 KGS Lab
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(148,163,184,0.45)';
+    ctx.font = '400 11px "Space Grotesk", sans-serif';
+    ctx.fillText('KGS Lab', W / 2, y + 4);
+
 
     return canvas;
 }
 
-async function buildResultImageFile(done, avgAge, grade) {
+async function buildResultImageFile(done, avgAge) {
     await document.fonts.ready;
-    const canvas = await drawResultCard(done, avgAge, grade);
+    const canvas = drawResultCard(done, avgAge);
     return new Promise(resolve => {
         canvas.toBlob(blob => {
             resolve(new File([blob], 'body-age-result.png', { type: 'image/png' }));
@@ -390,38 +478,12 @@ async function buildResultImageFile(done, avgAge, grade) {
     });
 }
 
-async function saveResultImage(done, avgAge, grade) {
-    const btn = document.getElementById('final-save');
-    if (btn) { btn.textContent = '⏳ 생성 중...'; btn.disabled = true; }
 
-    const file = await buildResultImageFile(done, avgAge, grade);
-
-    // 모바일: 이미지 파일 직접 공유
-    if (navigator.canShare?.({ files: [file] })) {
-        try {
-            await navigator.share({ title: '신체 나이 측정기', files: [file] });
-            resetSaveBtn(btn);
-            return;
-        } catch (e) {
-            if (e.name === 'AbortError') { resetSaveBtn(btn); return; }
-        }
-    }
-
-    // PC: 다운로드
-    const url = URL.createObjectURL(file);
-    const a = document.createElement('a');
-    a.download = 'body-age-result.png';
-    a.href = url;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
-    if (btn) { btn.textContent = '✅ 저장됨!'; setTimeout(() => resetSaveBtn(btn), 2000); }
-}
-
-async function shareResultImage(done, avgAge, grade) {
+async function shareResultImage(done, avgAge) {
     const btn = document.getElementById('final-share');
     if (btn) { btn.textContent = '⏳ 생성 중...'; btn.disabled = true; }
 
-    const file = await buildResultImageFile(done, avgAge, grade);
+    const file = await buildResultImageFile(done, avgAge);
 
     const reset = () => { if (btn) { btn.textContent = '📤 결과 공유하기'; btn.disabled = false; } };
 
@@ -445,9 +507,6 @@ async function shareResultImage(done, avgAge, grade) {
     reset();
 }
 
-function resetSaveBtn(btn) {
-    if (btn) { btn.textContent = '📸 이미지로 저장'; btn.disabled = false; }
-}
 
 
 async function shareApp() {
