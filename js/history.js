@@ -1,4 +1,4 @@
-import { navigate, showMain } from './app.js';
+import { navigate, showMain, HOME_ICON } from './app.js';
 
 const STORAGE_KEY = 'bodyage_history';
 const MAX_ENTRIES = 20;
@@ -189,7 +189,7 @@ export function showHistoryView() {
     const html = `
         <div class="history-box">
             <button class="btn-home" id="btn-home">
-                <span class="btn-home-icon">🏠</span><span>처음으로</span>
+                <span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span>
             </button>
             <div class="section-label">테스트 기록</div>
             ${hasAny ? sections : '<div class="history-empty">아직 기록이 없습니다.<br>테스트를 완료하면 여기에 쌓입니다.</div>'}

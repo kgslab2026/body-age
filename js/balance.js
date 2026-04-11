@@ -1,7 +1,7 @@
-import { navigate, state, showMain } from './app.js';
+import { navigate, state, showMain, HOME_ICON } from './app.js';
 import { calculator } from './calculator.js';
 import { renderTipsCard, initTipsCard } from './tips.js';
-import { saveResult, renderHistoryInline } from './history.js';
+import { saveResult } from './history.js';
 
 const TEST_DURATION = 10;
 
@@ -12,7 +12,7 @@ export function startBalanceTest() {
     if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div class="mobile-only-box with-top-gap">
                     <div class="mobile-only-icon">📱</div>
                     <div class="mobile-only-title">모바일 전용 테스트예요</div>
@@ -29,7 +29,7 @@ export function startBalanceTest() {
     function showStart() {
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h2 class="test-title-accent">균형감각 테스트</h2>
                 <div class="test-range-pill">측정 범위: 15살 ~ 70살</div>
                 <p class="test-copy-relaxed">
@@ -67,7 +67,7 @@ export function startBalanceTest() {
         if (!active) return;
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div class="test-center-icon">⚠️</div>
                 <div class="test-error-title">센서 권한이 필요합니다</div>
                 <p class="test-error-desc">설정 → Safari → 동작 및 방향 접근 허용</p>
@@ -80,19 +80,57 @@ export function startBalanceTest() {
         });
     }
 
-    function showCountdown(count) {
+    function showCountdown(startCount) {
         if (!active) return;
-        if (count === 0) { runTest(); return; }
+
         const html = `
-            <div class="balance-display">
-                <button class="btn-home btn-home-overlay" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
-                <div class="balance-countdown">${count}</div>
-                <div class="countdown-hint">한 발로 서세요!</div>
+            <div class="balance-display balance-display--ready">
+                <button class="btn-home btn-home-overlay" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
+                <div class="balance-phase-badge balance-phase-badge--ready">준비 중</div>
+                <div class="balance-countdown" id="cd-count">${startCount}</div>
+                <div class="balance-ring-wrap">
+                    <div class="balance-ring"></div>
+                    <div class="balance-dot" id="cd-dot"></div>
+                </div>
+                <div class="countdown-hint">볼을 가운데로 맞춰주세요!</div>
             </div>
         `;
         navigate(html, () => {
             document.getElementById('btn-home').onclick = goHome;
-            setTimeout(() => { if (active) showCountdown(count - 1); }, 1000);
+
+            let count = startCount;
+
+            const cdHandler = (e) => {
+                if (!active) return;
+                const beta = e.beta ?? 0;
+                const gamma = e.gamma ?? 0;
+                const dx = Math.max(-60, Math.min(60, gamma * 3));
+                const dy = Math.max(-60, Math.min(60, beta * 3));
+                const dot = document.getElementById('cd-dot');
+                if (dot) {
+                    dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    dot.style.background = dist < 20 ? '#22c55e' : dist < 45 ? '#fbbf24' : '#f87171';
+                }
+            };
+            window.addEventListener('deviceorientation', cdHandler);
+
+            const tick = setInterval(() => {
+                if (!active) {
+                    clearInterval(tick);
+                    window.removeEventListener('deviceorientation', cdHandler);
+                    return;
+                }
+                count--;
+                if (count <= 0) {
+                    clearInterval(tick);
+                    window.removeEventListener('deviceorientation', cdHandler);
+                    runTest();
+                } else {
+                    const cdEl = document.getElementById('cd-count');
+                    if (cdEl) cdEl.textContent = count;
+                }
+            }, 1000);
         });
     }
 
@@ -100,8 +138,6 @@ export function startBalanceTest() {
         if (!active) return;
 
         const readings = [];
-        let refBeta = null;
-        let refGamma = null;
         let timeLeft = TEST_DURATION;
         let orientHandler = null;
         let tick = null;
@@ -112,13 +148,19 @@ export function startBalanceTest() {
         }
 
         const html = `
-            <div class="balance-display">
+            <div class="balance-display balance-display--testing">
+                <div class="balance-phase-badge balance-phase-badge--testing">
+                    <span class="balance-phase-dot"></span>측정 중
+                </div>
                 <div class="balance-timer" id="bal-timer">${TEST_DURATION}</div>
                 <div class="balance-ring-wrap">
                     <div class="balance-ring"></div>
                     <div class="balance-dot" id="bal-dot"></div>
                 </div>
-                <div class="balance-live-hint">최대한 안정적으로!</div>
+                <div class="balance-progress-wrap">
+                    <div class="balance-progress-bar" id="bal-progress"></div>
+                </div>
+                <div class="balance-live-hint">최대한 안정적으로 버텨주세요!</div>
             </div>
         `;
 
@@ -127,12 +169,12 @@ export function startBalanceTest() {
                 if (!active) return;
                 const beta = e.beta ?? 0;
                 const gamma = e.gamma ?? 0;
-                if (refBeta === null) { refBeta = beta; refGamma = gamma; }
 
                 readings.push({ beta, gamma });
 
-                const dx = Math.max(-60, Math.min(60, (gamma - refGamma) * 3));
-                const dy = Math.max(-60, Math.min(60, (beta - refBeta) * 3));
+                // 절대값 기준(beta=0, gamma=0)으로 볼 위치 계산
+                const dx = Math.max(-60, Math.min(60, gamma * 3));
+                const dy = Math.max(-60, Math.min(60, beta * 3));
                 const dot = document.getElementById('bal-dot');
                 if (dot) {
                     dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
@@ -148,6 +190,8 @@ export function startBalanceTest() {
                 timeLeft--;
                 const timerEl = document.getElementById('bal-timer');
                 if (timerEl) timerEl.textContent = timeLeft;
+                const progressEl = document.getElementById('bal-progress');
+                if (progressEl) progressEl.style.width = `${((TEST_DURATION - timeLeft) / TEST_DURATION) * 100}%`;
                 if (timeLeft <= 0) {
                     cleanup();
                     calculateResult(readings);
@@ -176,7 +220,7 @@ export function startBalanceTest() {
         if (!active) return;
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div class="test-center-icon">📱</div>
                 <div class="test-error-title">센서를 감지할 수 없어요</div>
                 <p class="test-error-desc">
@@ -205,12 +249,11 @@ export function startBalanceTest() {
 
         const html = `
             <div class="result-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h2 class="result-title">측정 결과</h2>
                 <div class="age-result" style="font-size: 48px;">${ageLabel}</div>
                 <p class="result-sub-note">흔들림 수치: <strong>${sway.toFixed(1)}°</strong></p>
-                ${renderHistoryInline('balance')}
-                ${renderTipsCard('balance')}
+${renderTipsCard('balance')}
                 <div class="test-action-row test-action-row--compact">
                     <button id="retry-btn" class="btn btn-ghost-light">다시하기</button>
                     <button id="next-btn" class="btn btn-flex">다음 단계</button>

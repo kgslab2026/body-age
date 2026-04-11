@@ -1,7 +1,7 @@
-import { navigate, state, showMain } from './app.js';
+import { navigate, state, showMain, HOME_ICON } from './app.js';
 import { calculator } from './calculator.js';
 import { renderTipsCard, initTipsCard } from './tips.js';
-import { saveResult, renderHistoryInline } from './history.js';
+import { saveResult } from './history.js';
 
 const testFreqs = [
     8000, 8200, 8400, 8600, 8800,
@@ -57,7 +57,7 @@ export function startHearingTest() {
     function showAudioError() {
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div style="font-size:3rem; margin:20px 0; text-align:center;">🔇</div>
                 <div style="font-size:1.2rem; font-weight:900; color:#f87171; text-align:center;">오디오를 사용할 수 없어요</div>
                 <p style="color:#888; text-align:center; line-height:1.7; margin-top:10px;">
@@ -85,10 +85,15 @@ export function startHearingTest() {
 
         const testHtml = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h3 style="color: #888; margin-top: 10px;">탐색 단계 ${stepCount}</h3>
-                <div id="status-text" style="font-size: 1.5rem; margin: 30px 0;">곧 소리가 재생됩니다...</div>
-                <div style="font-size: 4rem; color: var(--primary-color);">🔊</div>
+                <div id="status-text" style="font-size: 1.5rem; margin: 20px 0;">곧 소리가 재생됩니다...</div>
+                <div class="hearing-wave-wrap" id="sound-wave-wrap">
+                    <span class="hearing-wave-ring hw-r1"></span>
+                    <span class="hearing-wave-ring hw-r2"></span>
+                    <span class="hearing-wave-ring hw-r3"></span>
+                    <div class="hearing-wave-icon">🔊</div>
+                </div>
             </div>
         `;
 
@@ -98,11 +103,13 @@ export function startHearingTest() {
             setTimeout(() => {
                 document.getElementById('status-text').innerHTML =
                     `<span style="color: var(--primary-color); font-weight:bold;">소리 재생 중! 집중하세요!</span>`;
+                const waveWrap = document.getElementById('sound-wave-wrap');
+                if (waveWrap) waveWrap.classList.add('playing');
 
                 playSound(targetHz, () => {
                     const questionHtml = `
                         <div class="test-box">
-                            <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                            <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                             <h3 style="color: #888; margin-top: 10px;">탐색 단계 ${stepCount}</h3>
                             <div style="font-size: 1.3rem; margin: 20px 0;">방금 소리가 들렸나요?</div>
                             <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
@@ -154,10 +161,10 @@ export function startHearingTest() {
 
     const startHtml = `
         <div class="test-box">
-            <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+            <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
             <h2 style="color: var(--primary-color); margin-top: 10px;">정밀 탐색 모드</h2>
             <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 15살 ~ 70살</div>
-            <p style="line-height: 1.6;">소리가 들리는지 <strong>예/아니오</strong>로만 답해주세요.<br>약 4~5번의 질문으로 정확한 나이를 찾아냅니다.</p>
+            <p style="line-height: 1.6;">소리가 들리는지 <strong>예/아니오</strong>로만 답해주세요.<br>약 6~7번의 질문으로 정확한 나이를 찾아냅니다.</p>
             <div style="display:flex; flex-direction:column; gap:8px; margin-top:16px; text-align:left;">
                 <div style="display:flex; align-items:center; gap:8px; background:rgba(108,99,255,0.07); border-radius:10px; padding:10px 14px; font-size:0.88rem; color:var(--text-color);">
                     <span style="font-size:1.1rem;">🎧</span>
@@ -203,12 +210,11 @@ function showResult(hz) {
 
     const resultHtml = `
         <div class="result-box">
-            <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+            <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
             <h2 style="font-size: 1.8rem; margin-top: 10px;">측정 결과</h2>
             <div class="age-result">${ageDisplay}</div>
             <div style="margin: 20px 0;">${specialMessage}</div>
-            ${renderHistoryInline('hearing')}
-            ${renderTipsCard('hearing')}
+${renderTipsCard('hearing')}
             <div style="display: flex; gap: 15px; width: 100%; margin-top: 12px;">
                 <button id="retry-btn" class="btn" style="flex:1; background: #475569;">다시하기</button>
                 <button id="next-btn" class="btn" style="flex:1;">다음 단계</button>

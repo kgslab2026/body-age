@@ -1,10 +1,10 @@
-import { navigate, state, showMain } from './app.js';
+import { navigate, state, showMain, HOME_ICON } from './app.js';
 import { calculator } from './calculator.js';
 import { renderTipsCard, initTipsCard } from './tips.js';
-import { saveResult, renderHistoryInline } from './history.js';
+import { saveResult } from './history.js';
 
 const TOTAL_ROUNDS = 2;
-const TIME_LIMIT = 60000;
+const TIME_LIMIT = 30000;
 
 export function startNumberTest() {
     let active = true;
@@ -13,7 +13,7 @@ export function startNumberTest() {
     function showStart() {
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h2 style="color: var(--primary-color); margin-top: 10px;">숫자 순서 테스트</h2>
                 <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 15살 ~ 70살</div>
                 <p style="line-height: 1.8;">1부터 16까지 <strong>순서대로</strong> 빠르게 탭하세요!<br>총 ${TOTAL_ROUNDS}라운드 · 각 최대 60초</p>
@@ -66,13 +66,13 @@ export function startNumberTest() {
 
             const html = `
                 <div class="test-box" style="gap: 10px;">
-                    <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                    <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                     <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                         <div style="font-size:0.9rem; color:#888;">${roundNum} / ${TOTAL_ROUNDS} 라운드</div>
-                        <div id="num-timer" style="font-size:1.5rem; font-weight:900; color:var(--primary-color);">60</div>
+                        <div style="font-size:0.85rem; color:#64748b;">다음: <strong id="next-num" style="color:var(--text-color); font-size:1rem;">1</strong></div>
                     </div>
-                    <div style="font-size:0.85rem; color:#64748b; align-self:flex-start;">
-                        다음: <strong id="next-num" style="color:var(--text-color); font-size:1rem;">1</strong>
+                    <div class="num-gauge-wrap">
+                        <div class="num-gauge-bar" id="num-gauge"></div>
                     </div>
                     <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:100%;" id="number-grid">
                         ${cells}
@@ -84,12 +84,24 @@ export function startNumberTest() {
                 document.getElementById('btn-home').onclick = () => { cleanup(); goHome(); };
                 startTime = performance.now();
 
+                // 게이지 CSS 트랜지션으로 부드럽게 줄어들게
+                const gauge = document.getElementById('num-gauge');
+                if (gauge) {
+                    gauge.style.transition = `width ${TIME_LIMIT}ms linear`;
+                    requestAnimationFrame(() => { gauge.style.width = '0%'; });
+                }
+
                 timerInterval = setInterval(() => {
                     if (!active) { cleanup(); return; }
                     const elapsed = performance.now() - startTime;
-                    const remaining = Math.max(0, Math.ceil((TIME_LIMIT - elapsed) / 1000));
-                    const timerEl = document.getElementById('num-timer');
-                    if (timerEl) timerEl.textContent = remaining;
+                    const pct = Math.max(0, ((TIME_LIMIT - elapsed) / TIME_LIMIT) * 100);
+                    const gaugeEl = document.getElementById('num-gauge');
+                    // 게이지 색상: 남은 시간에 따라 변경
+                    if (gaugeEl) {
+                        if (pct > 50) gaugeEl.style.background = 'linear-gradient(90deg, #7c3aed, #a855f7)';
+                        else if (pct > 25) gaugeEl.style.background = 'linear-gradient(90deg, #d97706, #fbbf24)';
+                        else gaugeEl.style.background = 'linear-gradient(90deg, #dc2626, #f87171)';
+                    }
                 }, 200);
 
                 timeoutHandle = setTimeout(() => {
@@ -139,11 +151,11 @@ export function startNumberTest() {
     function showBetweenRounds(nextRound, prevElapsed, onContinue) {
         if (!active) return;
         const timeText = prevElapsed >= TIME_LIMIT
-            ? '60.0초 (시간 초과)'
+            ? '30.0초 (시간 초과)'
             : `${(prevElapsed / 1000).toFixed(2)}초`;
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div style="font-size: 2.5rem; margin: 20px 0;">${prevElapsed >= TIME_LIMIT ? '⏱️' : '✅'}</div>
                 <div style="font-size: 1.3rem; font-weight: 900; color: ${prevElapsed >= TIME_LIMIT ? '#f87171' : '#22c55e'};">1라운드 완료</div>
                 <p style="color: #888; margin-top: 8px;">${timeText}</p>
@@ -166,19 +178,18 @@ export function startNumberTest() {
         const roundList = times.map((t, i) =>
             `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #334155;">
                 <span style="color:#888;">${i + 1}라운드</span>
-                <span style="font-weight:bold;">${t >= TIME_LIMIT ? '60.00초 (시간 초과)' : (t / 1000).toFixed(2) + '초'}</span>
+                <span style="font-weight:bold;">${t >= TIME_LIMIT ? '30.00초 (시간 초과)' : (t / 1000).toFixed(2) + '초'}</span>
             </div>`
         ).join('');
 
         const html = `
             <div class="result-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h2 style="font-size: 1.8rem; margin-top: 10px;">측정 결과</h2>
                 <div class="age-result">${age}살</div>
                 <p style="color:#888; margin: 5px 0 12px;">평균 시간: <strong style="color:#fff;">${(avgMs / 1000).toFixed(2)}초</strong></p>
                 <div style="width:100%; margin-bottom:12px; font-size:0.9rem;">${roundList}</div>
-                ${renderHistoryInline('number')}
-                ${renderTipsCard('number')}
+${renderTipsCard('number')}
                 <div style="display:flex; gap:15px; width:100%; margin-top:12px;">
                     <button id="retry-btn" class="btn" style="flex:1; background:#475569;">다시하기</button>
                     <button id="next-btn" class="btn" style="flex:1;">다음 단계</button>

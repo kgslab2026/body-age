@@ -1,7 +1,7 @@
-import { navigate, state, showMain } from './app.js';
+import { navigate, state, showMain, HOME_ICON } from './app.js';
 import { calculator } from './calculator.js';
 import { renderTipsCard, initTipsCard } from './tips.js';
-import { saveResult, renderHistoryInline } from './history.js';
+import { saveResult } from './history.js';
 
 const TOTAL_ROUNDS = 5;
 const LATE_THRESHOLD = 600;
@@ -15,9 +15,9 @@ export function startNeuralTest() {
     function showStart() {
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h2 style="color: var(--primary-color); margin-top: 10px;">반응속도 테스트</h2>
-                <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 15살 ~ 70살</div>
+                <div class="test-badge">측정 범위: 15살 ~ 70살</div>
                 <p style="line-height: 1.8;">화면이 <strong style="color:#22c55e;">초록색</strong>으로 바뀌는 순간<br>최대한 빠르게 탭하세요!<br><br>총 ${TOTAL_ROUNDS}번 측정 후 평균으로 계산합니다.</p>
                 <button id="start-btn" class="btn" style="margin-top: 30px; width: 100%;">준비 완료</button>
             </div>
@@ -35,7 +35,7 @@ export function startNeuralTest() {
 
         const waitHtml = `
             <div class="reaction-box waiting" id="reaction-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div class="round-label">${round} / ${TOTAL_ROUNDS}</div>
                 <div class="reaction-icon">🎯</div>
                 <div class="reaction-msg">초록색으로 바뀌면 탭하세요!</div>
@@ -86,6 +86,9 @@ export function startNeuralTest() {
                 } else {
                     const elapsed = Math.round(performance.now() - startTime);
                     startTime = null;
+                    // 초록 배경을 즉시 어둡게 되돌려 page-enter 애니메이션 시 번쩍임 방지
+                    box.classList.remove('go');
+                    box.classList.add('waiting');
                     if (elapsed >= LATE_THRESHOLD) {
                         showLateTap();
                     } else {
@@ -105,7 +108,7 @@ export function startNeuralTest() {
     function showLateTap() {
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div style="font-size: 3rem; margin: 20px 0;">⏱️</div>
                 <div style="font-size: 1.4rem; font-weight: bold; color: #f87171;">너무 늦었어요!</div>
                 <p style="color: #888; margin-top: 10px;">다시 측정합니다.</p>
@@ -121,7 +124,7 @@ export function startNeuralTest() {
     function showEarlyTap() {
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div style="font-size: 3rem; margin: 20px 0;">⚠️</div>
                 <div style="font-size: 1.4rem; font-weight: bold; color: #f87171;">너무 일찍 탭했어요!</div>
                 <p style="color: #888; margin-top: 10px;">초록색으로 바뀐 후에 탭하세요.</p>
@@ -147,13 +150,21 @@ export function startNeuralTest() {
 
         const html = `
             <div class="result-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
-                <h2 style="font-size: 1.8rem; margin-top: 10px;">측정 결과</h2>
-                <div class="age-result">${age}살</div>
-                <p style="color:#888; margin: 5px 0 12px;">평균 반응속도: <strong style="color:#fff;">${avg} ms</strong></p>
-                <div style="width:100%; margin-bottom: 12px; font-size: 0.9rem;">${roundList}</div>
-                ${renderHistoryInline('neural')}
-                ${renderTipsCard('neural')}
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
+                <div class="result-header">
+                    <h2 style="font-size: 1.2rem; opacity: 0.8;">당신의 반응속도 나이는?</h2>
+                    <div class="age-result-container">
+                        <span class="age-result-value">${age}</span>
+                        <span class="age-result-unit">살</span>
+                    </div>
+                    <p class="result-summary">평균 반응속도: <strong>${avg} ms</strong></p>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="round-history">${roundList}</div>
+                </div>
+
+${renderTipsCard('neural')}
                 <div style="display: flex; gap: 15px; width: 100%; margin-top: 12px;">
                     <button id="retry-btn" class="btn" style="flex:1; background: #475569;">다시하기</button>
                     <button id="next-btn" class="btn" style="flex:1;">다음 단계</button>

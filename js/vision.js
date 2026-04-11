@@ -1,17 +1,21 @@
-import { navigate, state, showMain } from './app.js';
+import { navigate, state, showMain, HOME_ICON } from './app.js';
 import { calculator } from './calculator.js';
 import { renderTipsCard, initTipsCard } from './tips.js';
-import { saveResult, renderHistoryInline } from './history.js';
+import { saveResult } from './history.js';
+
+const TIME_LIMIT_MS = 10000;
 
 const LEVELS = [
-    { offset: 30 },
-    { offset: 22 },
-    { offset: 15 },
-    { offset: 10 },
+    { offset: 35 },
+    { offset: 25 },
+    { offset: 18 },
+    { offset: 13 },
+    { offset: 9 },
+    { offset: 8 },
     { offset: 7 },
+    { offset: 6 },
     { offset: 5 },
-    { offset: 3 },
-    { offset: 2 },
+    { offset: 4 },
 ];
 
 export function startVisionTest() {
@@ -30,7 +34,7 @@ export function startVisionTest() {
 
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h2 style="color: var(--primary-color); margin-top: 10px;">색감 나이</h2>
                 <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 15살 ~ 70살</div>
                 <p style="line-height: 1.8;">9개 중 <strong>색이 다른 두 개</strong>를 찾아 탭하세요.<br>점점 차이가 줄어들어 어려워집니다!</p>
@@ -75,8 +79,11 @@ export function startVisionTest() {
 
             const html = `
                 <div class="vision-box">
-                    <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                    <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                     <div class="vision-progress">${roundIdx + 1} / ${LEVELS.length}</div>
+                    <div class="vision-timer-wrap">
+                        <div class="vision-timer-bar" id="vision-timer-bar"></div>
+                    </div>
                     <div class="vision-grid">${cells}</div>
                     <div class="vision-label">색이 다른 두 개를 탭하세요</div>
                 </div>
@@ -86,6 +93,33 @@ export function startVisionTest() {
                 document.getElementById('btn-home').onclick = goHome;
                 let tappedCount = 0;
                 let hits = 0;
+                let timeoutId = null;
+
+                // 게이지 애니메이션
+                const timerBar = document.getElementById('vision-timer-bar');
+                if (timerBar) {
+                    timerBar.style.transition = `width ${TIME_LIMIT_MS}ms linear`;
+                    requestAnimationFrame(() => { timerBar.style.width = '0%'; });
+                }
+
+                function finishRound() {
+                    clearTimeout(timeoutId);
+                    document.querySelectorAll('.vision-cell').forEach(c => {
+                        c.style.pointerEvents = 'none';
+                        if (targetIdxs.includes(parseInt(c.dataset.idx))) {
+                            c.style.background = '#22c55e';
+                        }
+                    });
+                    results.push({ hits });
+                    setTimeout(nextRound, 500);
+                }
+
+                // 10초 초과 시 자동 오답
+                timeoutId = setTimeout(() => {
+                    if (!active) return;
+                    finishRound();
+                }, TIME_LIMIT_MS);
+
                 document.querySelectorAll('.vision-cell').forEach(cell => {
                     cell.onclick = () => {
                         if (!active) return;
@@ -95,16 +129,7 @@ export function startVisionTest() {
                         cell.style.background = isTarget ? '#22c55e' : '#ef4444';
                         if (isTarget) hits++;
                         tappedCount++;
-                        if (tappedCount === 2) {
-                            document.querySelectorAll('.vision-cell').forEach(c => {
-                                c.style.pointerEvents = 'none';
-                                if (targetIdxs.includes(parseInt(c.dataset.idx))) {
-                                    c.style.background = '#22c55e';
-                                }
-                            });
-                            results.push({ hits });
-                            setTimeout(nextRound, 500);
-                        }
+                        if (tappedCount === 2) finishRound();
                     };
                 });
             });
@@ -117,18 +142,17 @@ export function startVisionTest() {
         if (!active) return;
         const correctCount = results.filter(r => r.hits === 2).length;
         const partialCount = results.filter(r => r.hits === 1).length;
-        const age = calculator.getVisionAge(correctCount, partialCount > 0);
+        const age = calculator.getVisionAge(correctCount, partialCount);
         state.save('vision', correctCount);
         saveResult('vision', age, `${correctCount}/${LEVELS.length}개`);
 
         const html = `
             <div class="result-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h2 style="font-size: 1.8rem; margin-top: 10px;">측정 결과</h2>
                 <div class="age-result">${age}살</div>
                 <p style="color:#888; margin: 5px 0 12px;">정답: <strong style="color:var(--text-color);">${correctCount} / ${LEVELS.length}</strong></p>
-                ${renderHistoryInline('vision')}
-                ${renderTipsCard('vision')}
+${renderTipsCard('vision')}
                 <div style="display: flex; gap: 15px; width: 100%; margin-top: 12px;">
                     <button id="retry-btn" class="btn" style="flex:1; background: #475569;">다시하기</button>
                     <button id="next-btn" class="btn" style="flex:1;">완료</button>

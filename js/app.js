@@ -10,6 +10,11 @@ import { showHistoryView } from './history.js';
 
 export const APP_URL = 'https://kgslab2026.github.io/body-age/';
 
+export const HOME_ICON = `<svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+  <path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M7 18v-5h6v5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>`;
+
 const ICONS = {
     hearing: `<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><path d="M19 7c-6.5 0-11 5-11 11 0 4 1.8 7.5 4.5 9.5v7c0 2 1.5 3 3.5 3h2c2 0 3-1.5 3-3v-2c0-2 1-3 2.5-4.5C25.5 26.5 28 23 28 18c0-6.5-4-11-9-11z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M19 13c-3 0-5 2.5-5 5 0 2 1 3.5 2.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".6"/><path d="M31 14c2 2 3 4 3 6s-1 4.5-3 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/><path d="M35 10.5c3 3.5 4.5 7 4.5 9.5s-1.5 6.5-4.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".25"/></svg>`,
     neural:  `<svg viewBox="0 0 44 44" width="1em" height="1em" fill="none" aria-hidden="true"><path d="M27 4L11 24h11L17 40 37 20H26z" fill="currentColor" opacity=".12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M27 4L11 24h11L17 40 37 20H26z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><line x1="5" y1="19" x2="9" y2="19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".4"/><line x1="4" y1="24" x2="8" y2="24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".3"/><line x1="5" y1="29" x2="9" y2="29" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".2"/></svg>`,
@@ -140,7 +145,7 @@ function showFinalResult() {
     if (done.length === 0) {
         const html = `
             <div class="test-box">
-                <button class="btn-home" id="btn-home"><span class="btn-home-icon">🏠</span><span>처음으로</span></button>
+                <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div class="empty-result-icon">🏆</div>
                 <div class="empty-result-title">아직 측정 결과가 없어요</div>
                 <p class="empty-result-copy">테스트를 하나 이상 완료하면<br>종합 결과를 볼 수 있어요!</p>
@@ -486,7 +491,7 @@ export function showMain() {
             <div class="hero">
                 <div class="hero-text">
                     <div class="hero-badge">신체 나이 측정기</div>
-                    <div class="hero-main">재미로 확인하는<br>내 신체 나이 측정</div>
+                    <div class="hero-main">재미로 해보는<br>내 신체 나이 테스트</div>
                 </div>
                 <div class="hero-pulse">
                     <span class="pulse-ring r1"></span>
