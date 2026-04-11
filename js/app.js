@@ -60,14 +60,14 @@ export function navigate(contentHtml, initFunction) {
 }
 
 const indicators = [
-    { id: 'hearing',   icon: ICONS.hearing,   label: '청력 나이',    color: 'cyan',    available: true, action: startHearingTest,   range: '15~70세' },
-    { id: 'neural',    icon: ICONS.neural,    label: '반응속도 나이', color: 'amber',   available: true, action: startNeuralTest,    range: '15~70세' },
-    { id: 'balance',   icon: ICONS.balance,   label: '균형감각 나이', color: 'emerald', available: true, action: startBalanceTest,   range: '15~70세' },
-    { id: 'attention', icon: ICONS.attention, label: '집중력 나이',   color: 'red',     available: true, action: startAttentionTest, range: '15~70세' },
-    { id: 'vision',    icon: ICONS.vision,    label: '색감 나이',     color: 'violet',  available: true, action: startVisionTest,    range: '15~70세' },
-    { id: 'brain',     icon: ICONS.brain,     label: '기억력 나이',   color: 'blue',    available: true, action: startMemoryTest,    range: '15~70세' },
-    { id: 'number',    icon: ICONS.number,    label: '처리속도 나이',  color: 'orange',  available: true, action: startNumberTest,    range: '15~70세' },
-    { id: 'coming1',   icon: '🚧',            label: '',              color: 'gray',    available: false },
+    { id: 'hearing',   icon: ICONS.hearing,   emoji: '👂', label: '청력 나이',    color: 'cyan',    available: true, action: startHearingTest,   range: '15~70세' },
+    { id: 'neural',    icon: ICONS.neural,    emoji: '⚡', label: '반응속도 나이', color: 'amber',   available: true, action: startNeuralTest,    range: '15~70세' },
+    { id: 'balance',   icon: ICONS.balance,   emoji: '🧘', label: '균형감각 나이', color: 'emerald', available: true, action: startBalanceTest,   range: '15~70세' },
+    { id: 'attention', icon: ICONS.attention, emoji: '🎯', label: '집중력 나이',   color: 'red',     available: true, action: startAttentionTest, range: '15~70세' },
+    { id: 'vision',    icon: ICONS.vision,    emoji: '👁️', label: '색감 나이',     color: 'violet',  available: true, action: startVisionTest,    range: '15~70세' },
+    { id: 'brain',     icon: ICONS.brain,     emoji: '🧠', label: '기억력 나이',   color: 'blue',    available: true, action: startMemoryTest,    range: '15~70세' },
+    { id: 'number',    icon: ICONS.number,    emoji: '🔢', label: '처리속도 나이',  color: 'orange',  available: true, action: startNumberTest,    range: '15~70세' },
+    { id: 'coming1',   icon: '🚧',            emoji: '🚧', label: '',              color: 'gray',    available: false },
 ];
 
 // brain indicator의 결과는 state.results.memory에 저장됨
@@ -135,7 +135,7 @@ function showFinalResult() {
     for (const i of indicators) {
         if (!i.available) continue;
         if (hasResult(i.id)) {
-            done.push({ icon: i.icon, label: i.label.replace(' 나이', ''), age: getResultAge(i.id) });
+            done.push({ icon: i.icon, emoji: i.emoji, label: i.label.replace(' 나이', ''), age: getResultAge(i.id) });
         } else {
             pending.push({ icon: i.icon, label: i.label.replace(' 나이', '') });
         }
@@ -150,11 +150,23 @@ function showFinalResult() {
                 <div class="empty-result-title">아직 측정 결과가 없어요</div>
                 <p class="empty-result-copy">테스트를 하나 이상 완료하면<br>종합 결과를 볼 수 있어요!</p>
                 <button id="btn-home2" class="btn empty-result-cta">테스트 시작하기</button>
+                <button id="btn-save-empty" class="save-img-btn" style="margin-top:16px">📸 이미지로 저장</button>
+                <div class="final-share-row" style="margin-top:8px">
+                    <button id="btn-share-empty" class="share-fab">📤 결과 공유하기</button>
+                    <button id="btn-recommend-empty" class="share-fab">🔗 친구에게 추천하기</button>
+                </div>
+                <div class="final-sub-actions" style="margin-top:8px">
+                    <button id="btn-history-empty" class="history-fab">📋 이전 기록 보기</button>
+                </div>
             </div>
         `;
         navigate(html, () => {
             document.getElementById('btn-home').onclick = showMain;
             document.getElementById('btn-home2').onclick = showMain;
+            document.getElementById('btn-save-empty').addEventListener('click', () => showToast('📋 검사 결과가 없습니다'));
+            document.getElementById('btn-share-empty').addEventListener('click', () => showToast('📋 검사 결과가 없습니다'));
+            document.getElementById('btn-recommend-empty').addEventListener('click', shareApp);
+            document.getElementById('btn-history-empty').addEventListener('click', showHistoryView);
         });
         return;
     }
@@ -192,9 +204,6 @@ function showFinalResult() {
         ? `<p class="final-note">* ${pending.length}개 미완료 — 모두 측정하면 더 정확해져요</p>`
         : '';
 
-    const shareLabels = done.map(e => e.label).join('·');
-    const shareText = `신체 나이 측정기에서 ${shareLabels} 측정 결과, 평균 ${avgAge}살! 너도 해봐 👇`;
-
     const html = `
         <div class="final-box">
             <div class="final-header">
@@ -221,15 +230,7 @@ function showFinalResult() {
         document.getElementById('final-home').onclick = showMain;
         document.getElementById('final-history').onclick = showHistoryView;
         document.getElementById('final-save').addEventListener('click', () => saveResultImage(done, avgAge, grade));
-        document.getElementById('final-share').addEventListener('click', async () => {
-            const btn = document.getElementById('final-share');
-            if (navigator.share) {
-                try { await navigator.share({ title: '신체 나이 측정기', text: shareText, url: APP_URL }); }
-                catch (e) { if (e.name !== 'AbortError') copyFinalLink(btn, `${shareText}\n${APP_URL}`); }
-            } else {
-                copyFinalLink(btn, `${shareText}\n${APP_URL}`);
-            }
-        });
+        document.getElementById('final-share').addEventListener('click', () => shareResultImage(done, avgAge, grade));
         document.getElementById('final-recommend').addEventListener('click', shareApp);
     });
 }
@@ -325,7 +326,7 @@ function drawResultCard(done, avgAge, grade) {
     for (const e of done) {
         // 아이콘
         ctx.font = '15px sans-serif';
-        ctx.fillText(e.icon, pad, y + 11);
+        ctx.fillText(e.emoji ?? e.icon, pad, y + 11);
 
         // 라벨
         ctx.fillStyle = '#94a3b8';
@@ -370,49 +371,75 @@ function drawResultCard(done, avgAge, grade) {
     return canvas;
 }
 
+async function buildResultImageFile(done, avgAge, grade) {
+    await document.fonts.ready;
+    const canvas = drawResultCard(done, avgAge, grade);
+    return new Promise(resolve => {
+        canvas.toBlob(blob => {
+            resolve(new File([blob], 'body-age-result.png', { type: 'image/png' }));
+        }, 'image/png');
+    });
+}
+
 async function saveResultImage(done, avgAge, grade) {
     const btn = document.getElementById('final-save');
     if (btn) { btn.textContent = '⏳ 생성 중...'; btn.disabled = true; }
 
-    await document.fonts.ready;
-    const canvas = drawResultCard(done, avgAge, grade);
+    const file = await buildResultImageFile(done, avgAge, grade);
 
-    canvas.toBlob(async (blob) => {
-        const file = new File([blob], 'body-age-result.png', { type: 'image/png' });
-
-        // 모바일: 이미지 파일 직접 공유
-        if (navigator.canShare?.({ files: [file] })) {
-            try {
-                await navigator.share({ title: '신체 나이 측정기', files: [file] });
-                resetSaveBtn(btn);
-                return;
-            } catch (e) {
-                if (e.name === 'AbortError') { resetSaveBtn(btn); return; }
-            }
+    // 모바일: 이미지 파일 직접 공유
+    if (navigator.canShare?.({ files: [file] })) {
+        try {
+            await navigator.share({ title: '신체 나이 측정기', files: [file] });
+            resetSaveBtn(btn);
+            return;
+        } catch (e) {
+            if (e.name === 'AbortError') { resetSaveBtn(btn); return; }
         }
+    }
 
-        // PC: 다운로드
-        const a = document.createElement('a');
-        a.download = 'body-age-result.png';
-        a.href = URL.createObjectURL(blob);
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 10000);
-        if (btn) { btn.textContent = '✅ 저장됨!'; setTimeout(() => resetSaveBtn(btn), 2000); }
-    }, 'image/png');
+    // PC: 다운로드
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.download = 'body-age-result.png';
+    a.href = url;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    if (btn) { btn.textContent = '✅ 저장됨!'; setTimeout(() => resetSaveBtn(btn), 2000); }
+}
+
+async function shareResultImage(done, avgAge, grade) {
+    const btn = document.getElementById('final-share');
+    if (btn) { btn.textContent = '⏳ 생성 중...'; btn.disabled = true; }
+
+    const file = await buildResultImageFile(done, avgAge, grade);
+
+    const reset = () => { if (btn) { btn.textContent = '📤 결과 공유하기'; btn.disabled = false; } };
+
+    if (navigator.canShare?.({ files: [file] })) {
+        try {
+            await navigator.share({ title: '신체 나이 측정기', files: [file] });
+            reset();
+            return;
+        } catch (e) {
+            if (e.name === 'AbortError') { reset(); return; }
+        }
+    }
+
+    // 공유 API 미지원 시 다운로드로 대체
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.download = 'body-age-result.png';
+    a.href = url;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    reset();
 }
 
 function resetSaveBtn(btn) {
     if (btn) { btn.textContent = '📸 이미지로 저장'; btn.disabled = false; }
 }
 
-function copyFinalLink(btn, text) {
-    navigator.clipboard.writeText(text).then(() => {
-        const orig = btn.textContent;
-        btn.textContent = '✅ 복사됨!';
-        btn.classList.add('share-fab--copied');
-        setTimeout(() => { btn.textContent = orig; btn.classList.remove('share-fab--copied'); }, 2000);
-    });
-}
 
 async function shareApp() {
     const shareData = {
@@ -447,21 +474,22 @@ function copyLink() {
 }
 
 let toastTimer = null;
-function showComingSoonToast() {
+function showToast(msg) {
     let toast = document.getElementById('coming-toast');
     if (!toast) {
         toast = document.createElement('div');
         toast.id = 'coming-toast';
         toast.className = 'coming-toast';
-        toast.textContent = '🚧 곧 출시될 예정이에요!';
         document.body.appendChild(toast);
     }
+    toast.textContent = msg;
     clearTimeout(toastTimer);
     toast.classList.remove('show');
     void toast.offsetWidth; // reflow
     toast.classList.add('show');
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
 }
+function showComingSoonToast() { showToast('🚧 곧 출시될 예정이에요!'); }
 
 export function showMain() {
     const availableCount = indicators.filter(i => i.available).length;
