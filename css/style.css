@@ -1253,7 +1253,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 
 .balance-countdown {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 120px;
+    font-size: 86px;
     font-weight: 900;
     background: linear-gradient(135deg, #fff 0%, #34d399 100%);
     -webkit-background-clip: text;
@@ -1268,7 +1268,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 
 .balance-timer {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 52px;
+    font-size: 86px;
     font-weight: 900;
     color: #34d399;
     line-height: 1;

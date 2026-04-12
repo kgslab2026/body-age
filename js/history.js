@@ -1,16 +1,17 @@
 import { navigate, showMain, HOME_ICON, state } from './app.js';
+import { ICONS } from './icons.js';
 
 const STORAGE_KEY = 'bodyage_history';
 const MAX_ENTRIES = 20;
 
 const LABELS = {
-    hearing:   { icon: '🎵', label: '청력 나이' },
-    neural:    { icon: '⚡', label: '반응속도 나이' },
-    balance:   { icon: '🌀', label: '균형감각 나이' },
-    attention: { icon: '🎯', label: '집중력 나이' },
-    vision:    { icon: '🔮', label: '색감 나이' },
-    memory:    { icon: '🧩', label: '기억력 나이' },
-    number:    { icon: '🔢', label: '처리속도 나이' },
+    hearing:   { icon: ICONS.hearing,   label: '청력 나이' },
+    neural:    { icon: ICONS.neural,    label: '반응속도 나이' },
+    balance:   { icon: ICONS.balance,   label: '균형감각 나이' },
+    attention: { icon: ICONS.attention, label: '집중력 나이' },
+    vision:    { icon: ICONS.vision,    label: '색감 나이' },
+    memory:    { icon: ICONS.brain,     label: '기억력 나이' },
+    number:    { icon: ICONS.number,    label: '처리속도 나이' },
 };
 
 function load() {
