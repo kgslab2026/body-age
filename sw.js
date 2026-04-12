@@ -4,6 +4,8 @@ const BASE = '/body-age/';
 const ASSETS = [
     BASE,
     BASE + 'index.html',
+    BASE + 'privacy.html',
+    BASE + 'terms.html',
     BASE + 'manifest.json',
     BASE + 'css/style.css',
     BASE + 'js/app.js',
@@ -42,7 +44,12 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request).then(cached => {
             if (cached) return cached;
-            return fetch(event.request).catch(() => caches.match(BASE + 'index.html'));
+            return fetch(event.request).catch(() => {
+                if (event.request.mode === 'navigate') {
+                    return caches.match(BASE + 'index.html');
+                }
+                return Response.error();
+            });
         })
     );
 });

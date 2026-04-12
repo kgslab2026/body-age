@@ -1,14 +1,14 @@
 {
     "name": "신체 나이 측정기",
     "short_name": "Body Age",
-    "description": "6가지 지표로 신체 나이를 측정하는 앱",
+    "description": "7가지 지표로 신체 나이를 측정하는 앱",
     "lang": "ko",
     "start_url": "/body-age/",
     "scope": "/body-age/",
     "display": "standalone",
     "orientation": "portrait",
     "background_color": "#04060f",
-    "theme_color": "#7c3aed",
+    "theme_color": "#04060f",
     "categories": ["health", "lifestyle"],
     "icons": [
         {

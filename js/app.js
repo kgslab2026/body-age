@@ -82,10 +82,21 @@ function getResultAge(id) {
     switch (id) {
         case 'hearing':   return calculator.getHearingAge(value);
         case 'neural':    return calculator.getReactionAge(value);
-        case 'brain':     return calculator.getMemoryAge(value);
+        case 'brain':
+            if (value !== null && typeof value === 'object')
+                return value.partial && value.maxSpan >= 4
+                    ? calculator.getMemoryAgePartial(value.maxSpan)
+                    : calculator.getMemoryAge(value.maxSpan);
+            return calculator.getMemoryAge(value);
         case 'balance':   return calculator.getBalanceAge(value);
-        case 'attention': return calculator.getAttentionAge(value);
-        case 'vision':    return calculator.getVisionAge(value);
+        case 'attention':
+            if (value !== null && typeof value === 'object')
+                return calculator.getAttentionAge(value.correctCount, value.avgRawTime);
+            return calculator.getAttentionAge(0, value);
+        case 'vision':
+            if (value !== null && typeof value === 'object')
+                return calculator.getVisionAge(value.correctCount, value.partialCount);
+            return calculator.getVisionAge(value);
         case 'number':    return calculator.getNumberAge(value);
         default: return null;
     }
@@ -165,7 +176,7 @@ function showFinalResult() {
             document.getElementById('btn-home').onclick = showMain;
             document.getElementById('btn-home2').onclick = showMain;
             document.getElementById('btn-share-empty').addEventListener('click', () => showToast('📋 검사 결과가 없습니다'));
-            document.getElementById('btn-recommend-empty').addEventListener('click', shareApp);
+            document.getElementById('btn-recommend-empty').addEventListener('click', e => shareApp(e.currentTarget));
             document.getElementById('btn-history-empty').addEventListener('click', showHistoryView);
         });
         return;
@@ -228,7 +239,7 @@ function showFinalResult() {
         document.getElementById('final-home').onclick = showMain;
         document.getElementById('final-history').onclick = showHistoryView;
         document.getElementById('final-share').addEventListener('click', () => shareResultImage(done, avgAge));
-        document.getElementById('final-recommend').addEventListener('click', shareApp);
+        document.getElementById('final-recommend').addEventListener('click', e => shareApp(e.currentTarget));
     });
 }
 
@@ -514,7 +525,7 @@ async function shareResultImage(done, avgAge) {
 
 
 
-async function shareApp() {
+async function shareApp(triggerBtn) {
     const shareData = {
         title: '신체 나이 측정기',
         text: '내 신체 나이가 궁금하다면? 청력·반응속도·균형·집중력·색감·기억력으로 측정해봐! 🕹️',
@@ -525,16 +536,15 @@ async function shareApp() {
         try {
             await navigator.share(shareData);
         } catch (e) {
-            if (e.name !== 'AbortError') copyLink();
+            if (e.name !== 'AbortError') copyLink(triggerBtn);
         }
     } else {
-        copyLink();
+        copyLink(triggerBtn);
     }
 }
 
-function copyLink() {
+function copyLink(btn) {
     navigator.clipboard.writeText(APP_URL).then(() => {
-        const btn = document.getElementById('btn-share');
         if (!btn) return;
         const original = btn.textContent;
         btn.textContent = '✅ 링크 복사됨!';
@@ -573,7 +583,8 @@ export function showMain() {
 
         return `
             <div class="indicator-card card-${item.color} ${item.available ? 'available' : 'locked'} ${done ? 'completed' : ''}"
-                 id="card-${item.id}" ${item.available ? `aria-label="${item.label} 테스트 시작"` : `aria-label="준비중"`}>
+                 id="card-${item.id}" role="button" tabindex="0"
+                 ${item.available ? `aria-label="${item.label} 테스트 시작"` : `aria-label="준비중" aria-disabled="true"`}>
                 <div class="card-icon">${item.icon}</div>
                 <div class="card-label">${item.label}</div>
                 ${item.range ? `<div class="card-range">${item.range}</div>` : ''}
@@ -627,11 +638,11 @@ export function showMain() {
         indicators.forEach(item => {
             const card = document.getElementById(`card-${item.id}`);
             if (!card) return;
-            if (!item.available) {
-                card.onclick = showComingSoonToast;
-                return;
-            }
-            card.onclick = item.action;
+            const action = item.available ? item.action : showComingSoonToast;
+            card.onclick = action;
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); action(); }
+            });
         });
         document.getElementById('btn-final')?.addEventListener('click', showFinalResult);
         document.getElementById('btn-history')?.addEventListener('click', showHistoryView);

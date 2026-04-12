@@ -180,7 +180,7 @@ export function startMemoryTest() {
     function showResult(maxSpan, partial) {
         const baseAge = calculator.getMemoryAge(maxSpan);
         const age = partial && maxSpan >= 4 ? calculator.getMemoryAgePartial(maxSpan) : baseAge;
-        state.save('memory', maxSpan);
+        state.save('memory', { maxSpan, partial });
         saveResult('memory', age, `${maxSpan}자리`);
 
         const html = `

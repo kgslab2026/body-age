@@ -10,6 +10,7 @@ const LABELS = {
     attention: { icon: '🎯', label: '집중력 나이' },
     vision:    { icon: '🔮', label: '색감 나이' },
     memory:    { icon: '🧩', label: '기억력 나이' },
+    number:    { icon: '🔢', label: '처리속도 나이' },
 };
 
 function load() {

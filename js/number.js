@@ -16,7 +16,7 @@ export function startNumberTest() {
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h2 style="color: var(--primary-color); margin-top: 10px;">숫자 순서 테스트</h2>
                 <div style="display:inline-block; background: rgba(108,99,255,0.1); color: var(--primary-color); font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;">측정 범위: 15살 ~ 70살</div>
-                <p style="line-height: 1.8;">1부터 16까지 <strong>순서대로</strong> 빠르게 탭하세요!<br>총 ${TOTAL_ROUNDS}라운드 · 각 최대 60초</p>
+                <p style="line-height: 1.8;">1부터 16까지 <strong>순서대로</strong> 빠르게 탭하세요!<br>총 ${TOTAL_ROUNDS}라운드 · 각 최대 30초</p>
                 <div style="background: #1e293b; border-radius: 14px; padding: 14px 16px; width: 100%; margin-top: 8px;">
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
                         ${Array.from({ length: 16 }, (_, i) =>

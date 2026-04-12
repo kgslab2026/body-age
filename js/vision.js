@@ -143,7 +143,7 @@ export function startVisionTest() {
         const correctCount = results.filter(r => r.hits === 2).length;
         const partialCount = results.filter(r => r.hits === 1).length;
         const age = calculator.getVisionAge(correctCount, partialCount);
-        state.save('vision', correctCount);
+        state.save('vision', { correctCount, partialCount });
         saveResult('vision', age, `${correctCount}/${LEVELS.length}개`);
 
         const html = `
