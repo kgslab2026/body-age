@@ -152,12 +152,13 @@ export const calculator = {
     // 균형감각 (중심 이탈 60% + 흔들림 40% 합산 점수) → 나이
     // score = avgDist*0.6 + sway*0.4  (도 단위)
     balanceData: [
-        { sway:  0.8, age: 15 },
-        { sway:  2.0, age: 25 },
-        { sway:  3.5, age: 40 },
-        { sway:  6.0, age: 50 },
-        { sway:  9.0, age: 60 },
-        { sway: 13.0, age: 70 },
+        { sway:  0.3, age: 15 },
+        { sway:  0.7, age: 20 },
+        { sway:  1.2, age: 30 },
+        { sway:  2.0, age: 40 },
+        { sway:  3.5, age: 50 },
+        { sway:  5.5, age: 60 },
+        { sway:  9.0, age: 70 },
     ],
 
     getBalanceAge(sway) {

@@ -1260,6 +1260,10 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     -webkit-text-fill-color: transparent;
     background-clip: text;
     line-height: 1;
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .balance-timer {
@@ -1269,6 +1273,10 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     color: #34d399;
     line-height: 1;
     filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.6));
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .balance-ring-wrap { position: relative; width: 180px; height: 180px; }
