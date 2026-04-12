@@ -1290,22 +1290,22 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 }
 
 .balance-ring-2 {
-    width: 130px; height: 130px;
+    width: 125px; height: 125px;
     border: 1.5px solid rgba(148, 163, 184, 0.25);
 }
 
 .balance-ring-3 {
-    width: 100px; height: 100px;
+    width: 90px; height: 90px;
     border: 1.5px solid rgba(251, 191, 36, 0.4);
 }
 
 .balance-ring-4 {
-    width: 70px; height: 70px;
+    width: 55px; height: 55px;
     border: 1.5px solid rgba(251, 191, 36, 0.65);
 }
 
 .balance-ring-inner {
-    width: 26px; height: 26px;
+    width: 20px; height: 20px;
     border: 2px solid rgba(34, 197, 94, 0.9);
     box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
 }
@@ -2134,6 +2134,25 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     width: 100%;
     margin-top: 0 !important;
     background: #1e293b;
+}
+
+.final-disclaimer {
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #475569;
+    line-height: 1.7;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 4px;
+}
+
+.final-disclaimer-link {
+    display: inline-block;
+    margin-top: 4px;
+    color: #64748b;
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
 /* ── 모바일 전용 안내 ── */

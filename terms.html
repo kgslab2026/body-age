@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>개인정보처리방침 · 신체 나이 측정기</title>
+    <title>이용약관 · 신체 나이 측정기</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
@@ -52,9 +52,7 @@
         }
 
         .btn-close:hover {
-            border-color: #7c3aed;
             color: #e2e8f0;
-            background: rgba(124, 58, 237, 0.14);
         }
 
         .btn-close:active {
@@ -87,19 +85,23 @@
             margin-top: 8px;
         }
 
-        .summary-box {
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            border-left: 4px solid #7c3aed;
+        .warning-box {
+            background: #1a0a0a;
+            border: 1px solid #7f1d1d;
+            border-left: 4px solid #ef4444;
             border-radius: 12px;
             padding: 20px 24px;
             margin-bottom: 40px;
             font-size: 15px;
-            color: #94a3b8;
+            color: #fca5a5;
+            line-height: 1.8;
         }
 
-        .summary-box strong {
-            color: #c4b5fd;
+        .warning-box strong {
+            color: #f87171;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 16px;
         }
 
         section {
@@ -168,6 +170,15 @@
             font-size: 12px;
             color: #334155;
         }
+
+        footer a {
+            color: #475569;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: #7c3aed;
+        }
     </style>
 </head>
 <body>
@@ -178,77 +189,61 @@
 
         <header>
             <div class="app-name">Body Age</div>
-            <h1>개인정보처리방침</h1>
-            <div class="updated">최종 업데이트: 2026년 4월 9일</div>
+            <h1>이용약관</h1>
+            <div class="updated">최종 업데이트: 2026년 4월 12일</div>
         </header>
 
-        <div class="summary-box">
-            <strong>한 줄 요약:</strong> 신체 나이 측정기는 사용자의 개인정보를 수집하거나 외부 서버로 전송하지 않습니다. 모든 테스트 결과는 사용자의 기기 내에만 저장됩니다.
+        <div class="warning-box">
+            <strong>⚠️ 중요 고지 — 의료 정보 아님</strong>
+            신체 나이 측정기의 모든 테스트 결과는 <strong style="color:#f87171;">의료적 진단, 처방, 치료 근거로 사용할 수 없습니다.</strong>
+            본 앱은 과학적 흥미와 자기 탐구를 목적으로 제작된 엔터테인먼트 앱이며, 의료기기 또는 의료 서비스가 아닙니다.
+            건강에 관한 결정은 반드시 자격을 갖춘 의료 전문가와 상담하시기 바랍니다.
         </div>
 
         <section>
-            <h2>1. 수집하는 정보</h2>
-            <p>본 앱은 다음의 데이터만 사용합니다.</p>
+            <h2>1. 서비스 목적 및 한계</h2>
+            <p>본 서비스는 다음 목적으로 제공됩니다.</p>
             <ul>
-                <li>테스트 결과 (청력 나이, 반응속도 나이, 균형감각 나이, 집중력 나이, 시력 나이, 기억력 나이)</li>
-                <li>테스트 수행 일시</li>
+                <li>청력, 반응속도, 균형감각, 집중력, 색감, 기억력, 처리속도 등 기능의 간이 측정</li>
+                <li>자기 탐구 및 건강 관심 유발을 위한 엔터테인먼트 제공</li>
+                <li>시간에 따른 개인 변화 추이 확인</li>
             </ul>
-            <p>위 데이터는 <span class="highlight">기기 내 로컬 저장소(localStorage)에만 저장</span>되며, 개발자나 제3자에게 전송되지 않습니다.</p>
-        </section>
-
-        <section>
-            <h2>2. 수집하지 않는 정보</h2>
+            <p>서비스는 다음 목적으로 사용될 수 없습니다.</p>
             <ul>
-                <li>이름, 이메일, 전화번호 등 개인 식별 정보</li>
-                <li>위치 정보</li>
-                <li>카메라, 마이크 접근 정보 (청력 테스트는 기기 스피커/이어폰만 사용)</li>
-                <li>기기 고유 식별자</li>
-                <li>광고 식별자</li>
+                <li>질병의 진단, 예측, 치료</li>
+                <li>의료기관 방문 대체</li>
+                <li>보험, 법적 판단, 고용 등 결정의 근거</li>
             </ul>
         </section>
 
         <section>
-            <h2>3. 데이터 저장 및 삭제</h2>
-            <p>테스트 기록은 사용자의 기기에만 저장됩니다. 다음 방법으로 언제든지 삭제할 수 있습니다.</p>
+            <h2>2. 면책 조항</h2>
+            <p>운영자는 다음 사항에 대해 책임을 지지 않습니다.</p>
             <ul>
-                <li>앱 내 <strong style="color:#e2e8f0;">"기록 전체 삭제"</strong> 버튼 사용</li>
-                <li>기기의 브라우저 데이터 삭제</li>
-                <li>앱 데이터 초기화 (Android 설정 → 앱 → 데이터 삭제)</li>
+                <li>테스트 결과의 정확성, 완전성, 신뢰성</li>
+                <li>서비스 이용으로 인한 직·간접적 손해</li>
+                <li>기기 센서 오류 또는 환경 요인으로 인한 부정확한 측정값</li>
+                <li>서비스 중단, 오류, 데이터 손실</li>
+                <li>테스트 결과를 근거로 한 개인의 의사결정 결과</li>
+            </ul>
+            <p>균형감각 테스트는 스마트폰 자이로스코프를 활용하며, 기기 종류 및 사용 환경에 따라 결과 편차가 클 수 있습니다.</p>
+        </section>
+
+        <section>
+            <h2>3. 안전 주의사항</h2>
+            <p>서비스 이용 시 다음 사항을 준수해 주세요.</p>
+            <ul>
+                <li>균형감각 테스트 중 넘어지지 않도록 안전한 장소에서 실시하세요</li>
+                <li>청력 테스트 시 이어폰 볼륨을 적정 수준으로 유지하세요</li>
+                <li>운전 중 또는 위험한 상황에서 테스트하지 마세요</li>
+                <li>심각한 건강 이상이 의심되면 즉시 의료기관을 방문하세요</li>
             </ul>
         </section>
 
         <section>
-            <h2>4. 외부 서비스</h2>
-            <p>본 앱은 화면 표시를 위해 Google Fonts를 사용합니다. Google Fonts 로드 시 Google 서버에 폰트 파일 요청이 발생할 수 있으며, 이는 Google의 개인정보처리방침을 따릅니다.</p>
-            <ul>
-                <li>Google 개인정보처리방침: <a href="https://policies.google.com/privacy" style="color:#7c3aed;">policies.google.com/privacy</a></li>
-            </ul>
-            <p>그 외 광고 네트워크, 분석 도구, 제3자 SDK는 사용하지 않습니다.</p>
-        </section>
-
-        <section>
-            <h2>5. 아동 개인정보 보호</h2>
-            <p>본 앱은 13세 미만 아동을 대상으로 개인정보를 수집하지 않습니다. 어떠한 개인정보도 수집하지 않으므로 아동이 안전하게 이용할 수 있습니다.</p>
-        </section>
-
-        <section>
-            <h2>6. 방침 변경</h2>
-            <p>개인정보처리방침이 변경될 경우 본 페이지에서 공지하며, 상단의 최종 업데이트 날짜를 변경합니다.</p>
-        </section>
-
-        <section>
-            <h2>7. 개발사 정보</h2>
+            <h2>4. 문의</h2>
             <div class="contact-box">
-                상호: <strong style="color:#e2e8f0;">케이지에스 랩 (KGS Lab)</strong><br>
-                이메일: <a href="mailto:KGSLab.2026@gmail.com">KGSLab.2026@gmail.com</a>
-            </div>
-        </section>
-
-        <section>
-            <h2>8. 문의</h2>
-            <div class="contact-box">
-                개인정보처리방침에 관한 문의사항이 있으시면 아래 이메일로 연락해 주세요.<br><br>
-                개인정보 처리 담당: 케이지에스 랩 (KGS Lab)<br>
+                운영자: <strong style="color:#e2e8f0;">케이지에스 랩 (KGS Lab)</strong><br>
                 이메일: <a href="mailto:KGSLab.2026@gmail.com">KGSLab.2026@gmail.com</a>
             </div>
         </section>
@@ -256,7 +251,7 @@
         <footer>
             © 2026 케이지에스 랩 (KGS Lab) · 신체 나이 측정기
             <br><br>
-            <a href="terms.html">이용약관</a>
+            <a href="privacy.html">개인정보처리방침</a>
         </footer>
     </div>
 
@@ -264,16 +259,8 @@
         const closeBtn = document.getElementById('btn-close');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
-                if (window.opener) {
-                    window.close();
-                    return;
-                }
-
-                if (window.history.length > 1) {
-                    window.history.back();
-                    return;
-                }
-
+                if (window.opener) { window.close(); return; }
+                if (window.history.length > 1) { window.history.back(); return; }
                 window.location.href = './index.html';
             });
         }

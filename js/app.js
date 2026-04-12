@@ -216,6 +216,11 @@ function showFinalResult() {
                 <button id="final-history" class="history-fab">📋 이전 기록 보기</button>
                 <button id="final-home" class="btn final-home-btn">처음으로</button>
             </div>
+            <div class="final-disclaimer">
+                본 결과는 의료 진단이 아닌 참고·오락 목적입니다.<br>
+                건강 이상이 의심되면 전문 의료기관을 방문하세요.
+                <a href="terms.html" class="final-disclaimer-link">이용약관</a>
+            </div>
         </div>
     `;
 
@@ -610,6 +615,8 @@ export function showMain() {
             <div class="card-grid">${cards}</div>
             <footer class="app-footer">
                 <a href="privacy.html" class="footer-link">개인정보처리방침</a>
+                <span class="footer-sep">·</span>
+                <a href="terms.html" class="footer-link">이용약관</a>
                 <span class="footer-sep">·</span>
                 <span class="footer-copy">© 2026 KGS Lab</span>
             </footer>

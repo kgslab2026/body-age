@@ -3,7 +3,7 @@ import { calculator } from './calculator.js';
 import { renderTipsCard, initTipsCard } from './tips.js';
 import { saveResult } from './history.js';
 
-const TEST_DURATION = 10;
+const TEST_DURATION = 15;
 
 export function startBalanceTest() {
     let active = true;
@@ -111,13 +111,13 @@ export function startBalanceTest() {
                 if (!active) return;
                 const beta = e.beta ?? 0;
                 const gamma = e.gamma ?? 0;
-                const dx = Math.max(-60, Math.min(60, gamma * 5));
-                const dy = Math.max(-60, Math.min(60, beta * 5));
+                const dx = Math.max(-60, Math.min(60, gamma * 6));
+                const dy = Math.max(-60, Math.min(60, beta * 6));
                 const dot = document.getElementById('bal-dot');
                 if (dot) {
                     dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    dot.style.background = dist < 12 ? '#22c55e' : dist < 32 ? '#fbbf24' : '#f87171';
+                    dot.style.background = dist < 10 ? '#22c55e' : dist < 27 ? '#fbbf24' : '#f87171';
                 }
                 if (measuring) readings.push({ beta, gamma });
             };
