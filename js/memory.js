@@ -155,15 +155,11 @@ export function startMemoryTest() {
     }
 
     function showWrong(sequence, input, partial) {
-        const bonusMsg = partial && span > 3
-            ? `<div style="color:#fbbf24; font-size:0.9rem; margin-bottom:16px;">1개만 틀렸어요! -3살 보너스 적용 🎉</div>`
-            : '';
         const html = `
             <div class="test-box">
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <div style="font-size: 3rem; margin: 16px auto;">${partial ? '🔥' : '❌'}</div>
                 <div style="font-size: 1.3rem; font-weight: 900; color: #f87171; margin-bottom: 8px;">틀렸어요!</div>
-                ${bonusMsg}
                 <div style="width:100%; background:#1e293b; border-radius:14px; padding: 16px; margin-bottom: 8px;">
                     <div style="font-size:0.8rem; color:#64748b; margin-bottom:8px;">정답</div>
                     <div style="font-size: 1.5rem; font-weight: 900; letter-spacing: 6px;">${sequence.join(' ')}</div>

@@ -149,15 +149,15 @@ export const calculator = {
         return 70;
     },
 
-    // 균형감각 (자이로스코프 흔들림 표준편차 °) → 나이
-    // 절대값(beta=0, gamma=0) 기준 측정
+    // 균형감각 (중심 이탈 60% + 흔들림 40% 합산 점수) → 나이
+    // score = avgDist*0.6 + sway*0.4  (도 단위)
     balanceData: [
-        { sway:  1.0, age: 15 },
-        { sway:  2.0, age: 25 },
-        { sway:  3.6, age: 40 },
-        { sway:  5.0, age: 50 },
-        { sway:  8.0, age: 60 },
-        { sway: 12.0, age: 70 },
+        { sway:  2.0, age: 15 },
+        { sway:  4.5, age: 25 },
+        { sway:  7.5, age: 40 },
+        { sway: 11.0, age: 50 },
+        { sway: 15.0, age: 60 },
+        { sway: 20.0, age: 70 },
     ],
 
     getBalanceAge(sway) {

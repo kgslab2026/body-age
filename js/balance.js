@@ -90,9 +90,13 @@ export function startBalanceTest() {
                 <div class="balance-countdown" id="cd-count">${startCount}</div>
                 <div class="balance-ring-wrap">
                     <div class="balance-ring"></div>
+                    <div class="balance-ring-2"></div>
+                    <div class="balance-ring-3"></div>
+                    <div class="balance-ring-4"></div>
+                    <div class="balance-ring-inner"></div>
                     <div class="balance-dot" id="cd-dot"></div>
                 </div>
-                <div class="countdown-hint">볼을 가운데로 맞춰주세요!</div>
+                <div class="countdown-hint">볼을 초록 원 안에 맞춰주세요!</div>
             </div>
         `;
         navigate(html, () => {
@@ -155,12 +159,16 @@ export function startBalanceTest() {
                 <div class="balance-timer" id="bal-timer">${TEST_DURATION}</div>
                 <div class="balance-ring-wrap">
                     <div class="balance-ring"></div>
+                    <div class="balance-ring-2"></div>
+                    <div class="balance-ring-3"></div>
+                    <div class="balance-ring-4"></div>
+                    <div class="balance-ring-inner"></div>
                     <div class="balance-dot" id="bal-dot"></div>
                 </div>
                 <div class="balance-progress-wrap">
                     <div class="balance-progress-bar" id="bal-progress"></div>
                 </div>
-                <div class="balance-live-hint">최대한 안정적으로 버텨주세요!</div>
+                <div class="balance-live-hint">초록 원 안에 최대한 유지하세요!</div>
             </div>
         `;
 
@@ -206,6 +214,10 @@ export function startBalanceTest() {
             showSensorError();
             return;
         }
+        // 중심(0,0)으로부터 평균 거리 — 가운데에 있을수록 낮음
+        const avgDist = readings.reduce((s, r) =>
+            s + Math.sqrt(r.beta * r.beta + r.gamma * r.gamma), 0) / readings.length;
+        // 흔들림(표준편차) — 안정적일수록 낮음
         const betaMean = readings.reduce((s, r) => s + r.beta, 0) / readings.length;
         const gammaMean = readings.reduce((s, r) => s + r.gamma, 0) / readings.length;
         const sway = Math.sqrt(
@@ -213,7 +225,9 @@ export function startBalanceTest() {
                 s + Math.pow(r.beta - betaMean, 2) + Math.pow(r.gamma - gammaMean, 2), 0)
             / readings.length
         );
-        showResult(sway);
+        // 최종 점수: 중심 이탈 60% + 흔들림 40%
+        const score = avgDist * 0.6 + sway * 0.4;
+        showResult(score);
     }
 
     function showSensorError() {
@@ -252,7 +266,7 @@ export function startBalanceTest() {
                 <button class="btn-home" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
                 <h2 class="result-title">측정 결과</h2>
                 <div class="age-result" style="font-size: 48px;">${ageLabel}</div>
-                <p class="result-sub-note">흔들림 수치: <strong>${sway.toFixed(1)}°</strong></p>
+                <p class="result-sub-note">중심 이탈 점수: <strong>${sway.toFixed(1)}°</strong></p>
 ${renderTipsCard('balance')}
                 <div class="test-action-row test-action-row--compact">
                     <button id="retry-btn" class="btn btn-ghost-light">다시하기</button>

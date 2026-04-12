@@ -6,7 +6,7 @@ import { startAttentionTest } from './attention.js';
 import { startVisionTest } from './vision.js';
 import { startNumberTest } from './number.js';
 import { calculator } from './calculator.js';
-import { showHistoryView } from './history.js';
+import { showHistoryView, showConfirm } from './history.js';
 
 export const APP_URL = 'https://kgslab2026.github.io/body-age/';
 
@@ -460,9 +460,9 @@ function drawResultCard(done, avgAge) {
 
     // 하단 KGS Lab
     ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(148,163,184,0.45)';
-    ctx.font = '400 11px "Space Grotesk", sans-serif';
-    ctx.fillText('KGS Lab', W / 2, y + 4);
+    ctx.fillStyle = 'rgba(196,181,253,0.6)';
+    ctx.font = '600 14px "Space Grotesk", sans-serif';
+    ctx.fillText('KGS Lab', W / 2, y + 8);
 
 
     return canvas;
@@ -512,7 +512,7 @@ async function shareResultImage(done, avgAge) {
 async function shareApp() {
     const shareData = {
         title: '신체 나이 측정기',
-        text: '내 신체 나이가 궁금하다면? 청력·반응속도·균형·집중력·시력·기억력으로 측정해봐! 🕹️',
+        text: '내 신체 나이가 궁금하다면? 청력·반응속도·균형·집중력·색감·기억력으로 측정해봐! 🕹️',
         url: APP_URL,
     };
 
@@ -629,8 +629,10 @@ export function showMain() {
         document.getElementById('btn-final')?.addEventListener('click', showFinalResult);
         document.getElementById('btn-history')?.addEventListener('click', showHistoryView);
         document.getElementById('summary-reset')?.addEventListener('click', () => {
-            state.clear();
-            showMain();
+            showConfirm('모든 결과를 초기화할까요?', () => {
+                state.clear();
+                showMain();
+            });
         });
     });
 }

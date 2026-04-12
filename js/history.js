@@ -1,4 +1,4 @@
-import { navigate, showMain, HOME_ICON } from './app.js';
+import { navigate, showMain, HOME_ICON, state } from './app.js';
 
 const STORAGE_KEY = 'bodyage_history';
 const MAX_ENTRIES = 20;
@@ -8,7 +8,7 @@ const LABELS = {
     neural:    { icon: '⚡', label: '반응속도 나이' },
     balance:   { icon: '🌀', label: '균형감각 나이' },
     attention: { icon: '🎯', label: '집중력 나이' },
-    vision:    { icon: '🔮', label: '시력 나이' },
+    vision:    { icon: '🔮', label: '색감 나이' },
     memory:    { icon: '🧩', label: '기억력 나이' },
 };
 
@@ -26,6 +26,26 @@ function clearByKey(key) {
     if (!data[key]) return;
     delete data[key];
     persist(data);
+}
+
+export function showConfirm(message, onOk) {
+    const overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay';
+    overlay.innerHTML = `
+        <div class="confirm-dialog">
+            <div class="confirm-title">삭제 확인</div>
+            <div class="confirm-msg">${message}</div>
+            <div class="confirm-btns">
+                <button class="confirm-cancel">취소</button>
+                <button class="confirm-ok">삭제</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('.confirm-cancel').onclick = () => overlay.remove();
+    overlay.querySelector('.confirm-ok').onclick = () => { overlay.remove(); onOk(); };
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 }
 
 export function saveResult(key, age, raw = null) {
@@ -207,18 +227,20 @@ export function showHistoryView() {
                 const key = btn.dataset.key;
                 if (!key) return;
                 const label = LABELS[key]?.label ?? '해당 지표';
-                if (confirm(`${label} 기록만 삭제할까요?`)) {
+                showConfirm(`${label} 기록을 삭제할까요?`, () => {
                     clearByKey(key);
+                    state.save(key, null);
                     showHistoryView();
-                }
+                });
             });
         });
 
         document.getElementById('clear-history-btn')?.addEventListener('click', () => {
-            if (confirm('모든 기록을 삭제할까요?')) {
+            showConfirm('모든 기록을 삭제할까요?', () => {
                 localStorage.removeItem(STORAGE_KEY);
-                showHistoryView();
-            }
+                state.clear();
+                showMain();
+            });
         });
     });
 }
