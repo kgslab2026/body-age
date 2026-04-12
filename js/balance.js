@@ -84,79 +84,9 @@ export function startBalanceTest() {
         if (!active) return;
 
         const html = `
-            <div class="balance-display balance-display--ready">
-                <button class="btn-home btn-home-overlay" id="btn-home"><span class="btn-home-icon">${HOME_ICON}</span><span>처음으로</span></button>
-                <div class="balance-phase-badge balance-phase-badge--ready">준비 중</div>
-                <div class="balance-countdown" id="cd-count">${startCount}</div>
-                <div class="balance-ring-wrap">
-                    <div class="balance-ring"></div>
-                    <div class="balance-ring-2"></div>
-                    <div class="balance-ring-3"></div>
-                    <div class="balance-ring-4"></div>
-                    <div class="balance-ring-inner"></div>
-                    <div class="balance-dot" id="cd-dot"></div>
-                </div>
-                <div class="countdown-hint">볼을 초록 원 안에 맞춰주세요!</div>
-            </div>
-        `;
-        navigate(html, () => {
-            document.getElementById('btn-home').onclick = goHome;
-
-            let count = startCount;
-
-            const cdHandler = (e) => {
-                if (!active) return;
-                const beta = e.beta ?? 0;
-                const gamma = e.gamma ?? 0;
-                const dx = Math.max(-60, Math.min(60, gamma * 3));
-                const dy = Math.max(-60, Math.min(60, beta * 3));
-                const dot = document.getElementById('cd-dot');
-                if (dot) {
-                    dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    dot.style.background = dist < 20 ? '#22c55e' : dist < 45 ? '#fbbf24' : '#f87171';
-                }
-            };
-            window.addEventListener('deviceorientation', cdHandler);
-
-            const tick = setInterval(() => {
-                if (!active) {
-                    clearInterval(tick);
-                    window.removeEventListener('deviceorientation', cdHandler);
-                    return;
-                }
-                count--;
-                if (count <= 0) {
-                    clearInterval(tick);
-                    window.removeEventListener('deviceorientation', cdHandler);
-                    runTest();
-                } else {
-                    const cdEl = document.getElementById('cd-count');
-                    if (cdEl) cdEl.textContent = count;
-                }
-            }, 1000);
-        });
-    }
-
-    function runTest() {
-        if (!active) return;
-
-        const readings = [];
-        let timeLeft = TEST_DURATION;
-        let orientHandler = null;
-        let tick = null;
-
-        function cleanup() {
-            if (orientHandler) window.removeEventListener('deviceorientation', orientHandler);
-            if (tick) clearInterval(tick);
-        }
-
-        const html = `
-            <div class="balance-display balance-display--testing">
-                <div class="balance-phase-badge balance-phase-badge--testing">
-                    <span class="balance-phase-dot"></span>측정 중
-                </div>
-                <div class="balance-timer" id="bal-timer">${TEST_DURATION}</div>
+            <div class="balance-display" id="bal-display">
+                <div class="balance-phase-badge balance-phase-badge--ready" id="bal-badge">준비 중</div>
+                <div class="balance-countdown" id="bal-num">${startCount}</div>
                 <div class="balance-ring-wrap">
                     <div class="balance-ring"></div>
                     <div class="balance-ring-2"></div>
@@ -165,46 +95,87 @@ export function startBalanceTest() {
                     <div class="balance-ring-inner"></div>
                     <div class="balance-dot" id="bal-dot"></div>
                 </div>
-                <div class="balance-progress-wrap">
+                <div class="balance-progress-wrap" id="bal-progress-wrap" style="opacity:0; transition:opacity 0.4s;">
                     <div class="balance-progress-bar" id="bal-progress"></div>
                 </div>
-                <div class="balance-live-hint">초록 원 안에 최대한 유지하세요!</div>
+                <div class="balance-live-hint" id="bal-hint">볼을 초록 원 안에 맞춰주세요!</div>
             </div>
         `;
 
         navigate(html, () => {
-            orientHandler = (e) => {
+            let count = startCount;
+            const readings = [];
+            let measuring = false;
+
+            const orientHandler = (e) => {
                 if (!active) return;
                 const beta = e.beta ?? 0;
                 const gamma = e.gamma ?? 0;
-
-                readings.push({ beta, gamma });
-
-                // 절대값 기준(beta=0, gamma=0)으로 볼 위치 계산
-                const dx = Math.max(-60, Math.min(60, gamma * 3));
-                const dy = Math.max(-60, Math.min(60, beta * 3));
+                const dx = Math.max(-60, Math.min(60, gamma * 5));
+                const dy = Math.max(-60, Math.min(60, beta * 5));
                 const dot = document.getElementById('bal-dot');
                 if (dot) {
                     dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    dot.style.background = dist < 20 ? '#22c55e' : dist < 45 ? '#fbbf24' : '#f87171';
+                    dot.style.background = dist < 12 ? '#22c55e' : dist < 32 ? '#fbbf24' : '#f87171';
                 }
+                if (measuring) readings.push({ beta, gamma });
             };
-
             window.addEventListener('deviceorientation', orientHandler);
 
-            tick = setInterval(() => {
-                if (!active) { cleanup(); return; }
-                timeLeft--;
-                const timerEl = document.getElementById('bal-timer');
-                if (timerEl) timerEl.textContent = timeLeft;
-                const progressEl = document.getElementById('bal-progress');
-                if (progressEl) progressEl.style.width = `${((TEST_DURATION - timeLeft) / TEST_DURATION) * 100}%`;
-                if (timeLeft <= 0) {
-                    cleanup();
-                    calculateResult(readings);
+            const cdTick = setInterval(() => {
+                if (!active) {
+                    clearInterval(cdTick);
+                    window.removeEventListener('deviceorientation', orientHandler);
+                    return;
+                }
+                count--;
+                if (count <= 0) {
+                    clearInterval(cdTick);
+                    startMeasuring();
+                } else {
+                    const el = document.getElementById('bal-num');
+                    if (el) el.textContent = count;
                 }
             }, 1000);
+
+            function startMeasuring() {
+                measuring = true;
+                let timeLeft = TEST_DURATION;
+
+                const badge = document.getElementById('bal-badge');
+                if (badge) {
+                    badge.className = 'balance-phase-badge balance-phase-badge--testing';
+                    badge.innerHTML = '<span class="balance-phase-dot"></span>측정 중';
+                }
+                const numEl = document.getElementById('bal-num');
+                if (numEl) {
+                    numEl.className = 'balance-timer';
+                    numEl.textContent = timeLeft;
+                }
+                const pw = document.getElementById('bal-progress-wrap');
+                if (pw) pw.style.opacity = '1';
+                const hint = document.getElementById('bal-hint');
+                if (hint) hint.textContent = '초록 원 안에 최대한 유지하세요!';
+
+                const measTick = setInterval(() => {
+                    if (!active) {
+                        clearInterval(measTick);
+                        window.removeEventListener('deviceorientation', orientHandler);
+                        return;
+                    }
+                    timeLeft--;
+                    const timerEl = document.getElementById('bal-num');
+                    if (timerEl) timerEl.textContent = timeLeft;
+                    const progressEl = document.getElementById('bal-progress');
+                    if (progressEl) progressEl.style.width = `${((TEST_DURATION - timeLeft) / TEST_DURATION) * 100}%`;
+                    if (timeLeft <= 0) {
+                        clearInterval(measTick);
+                        window.removeEventListener('deviceorientation', orientHandler);
+                        calculateResult(readings);
+                    }
+                }, 1000);
+            }
         });
     }
 

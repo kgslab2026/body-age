@@ -1181,7 +1181,7 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     width: 100%;
     min-height: 420px;
     background: #030509;
-    border: 1px solid rgba(52, 211, 153, 0.2);
+    border: 1px solid rgba(52, 211, 153, 0.25);
     border-radius: 22px;
     display: flex;
     flex-direction: column;
@@ -1190,7 +1190,8 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
     gap: 24px;
     position: relative;
     padding: 30px 20px;
-    box-shadow: inset 0 0 80px rgba(0,0,0,0.6), 0 0 30px rgba(52, 211, 153, 0.06);
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.6), 0 0 30px rgba(52, 211, 153, 0.08);
+    transition: border-color 0.5s, box-shadow 0.5s;
 }
 
 .balance-display--ready {
@@ -1304,9 +1305,9 @@ main::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radi
 }
 
 .balance-ring-inner {
-    width: 40px; height: 40px;
-    border: 2px solid rgba(34, 197, 94, 0.8);
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);
+    width: 26px; height: 26px;
+    border: 2px solid rgba(34, 197, 94, 0.9);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
 }
 
 .balance-dot {
