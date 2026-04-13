@@ -20,7 +20,7 @@ const testFreqs = [
 export function startHearingTest() {
     let low = 0;
     let high = testFreqs.length - 1;
-    let bestHz = 1000;
+    let bestHz = 0;
     let stepCount = 1;
     let audioCtx;
 
@@ -204,6 +204,8 @@ function showResult(hz) {
     if (hz >= 20000) {
         ageDisplay = "15세";
         specialMessage = `<p style="color: var(--primary-color); background: rgba(56, 189, 248, 0.1); padding: 15px; border-radius: 10px;">🌟 대박! 기계가 측정할 수 없는<br>신비로운 '초월 청력'을 가지셨네요!</p>`;
+    } else if (hz === 0) {
+        specialMessage = `<p>8,000 Hz 이하의 소리도 인식하지 못했습니다.</p>`;
     } else {
         specialMessage = `<p>최종 인식 주파수: <strong>${hz.toLocaleString()} Hz</strong></p>`;
     }
