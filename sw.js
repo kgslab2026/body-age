@@ -1,4 +1,4 @@
-const CACHE_NAME = 'body-age-v2';
+const CACHE_NAME = 'body-age-v3';
 const BASE = '/body-age/';
 
 const ASSETS = [
