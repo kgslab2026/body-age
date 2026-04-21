@@ -9,7 +9,7 @@ import { calculator } from './calculator.js';
 import { showHistoryView, showConfirm } from './history.js';
 import { ICONS } from './icons.js';
 
-export const APP_URL = 'https://kgslab2026.github.io/body-age/';
+export const APP_URL = 'https://play.google.com/store/apps/details?id=com.kgslab2026.bodyage';
 
 export const HOME_ICON = `<svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
   <path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
